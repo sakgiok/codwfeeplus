@@ -46,6 +46,51 @@ class AdminCODwFeePlusController extends ModuleAdminController
     private $_configform_hideable = false;
     private $_defCurrencySuffix = '';
     private $_checkupdate = false;
+    private $_validateCondFormValues = array(
+        array('name' => 'CODWFEEPLUS_ACTIVE', 'type' => 'Int', 'out' => 'active', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_DESCRIPTION', 'type' => 'Text', 'out' => 'description', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_INTEGRATION', 'type' => 'Int', 'out' => 'integration', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_TAXRULE', 'type' => 'Int', 'out' => 'tax rule', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_FEETYPE', 'type' => 'Int', 'out' => 'fee type', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_FEE', 'type' => 'Price', 'out' => 'fee', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_PERCENTAGE', 'type' => 'Percentage', 'out' => 'fee percentage', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_FEE_PERCENT_INCLUDE_CARRIER', 'type' => 'Int', 'out' => 'percent include carrier fee', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MIN', 'type' => 'Price', 'out' => 'minimum cart value', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MAX', 'type' => 'Price', 'out' => 'maximum cart value', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_CARTVALUE_SIGN', 'type' => 'Int', 'out' => 'cart value comparison', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_CARTVALUE', 'type' => 'Int', 'out' => 'cart value', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_CARTVALUE_INCLUDE_CARRIER', 'type' => 'Int', 'out' => 'cart value include carrier', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_DELIVERY_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'carriers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_COUNTRIES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'countries', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_ZONES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'zones', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_GROUPS_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'groups', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MATCHALL_GROUPS', 'type' => 'Int', 'out' => 'match all groups', 'multilang' => 0, 'req' => 0),
+        array('name' => 'cond_categoryBox', 'type' => 'ArrayWithIds', 'out' => 'categories', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MATCHALL_CATEGORIES', 'type' => 'Int', 'out' => 'match all categories', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MANUFACTURERS_ARRAY', 'type' => 'ArrayWithIdsWithZero', 'out' => 'manufacturers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MATCHALL_MANUFACTURERS', 'type' => 'Int', 'out' => 'match all manufacturers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_SUPPLIERS_ARRAY', 'type' => 'ArrayWithIdsWithZero', 'out' => 'suppliers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_MATCHALL_SUPPLIERS', 'type' => 'Int', 'out' => 'match all suppliers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_ID', 'type' => 'IntOrEmpty', 'out' => 'id', 'multilang' => 0, 'req' => 0),
+    );
+    private $_validateTestFormValues = array(
+        array('name' => 'tstfrm_cartvalue', 'type' => 'Price', 'out' => 'cart value', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_carriervalue', 'type' => 'Price', 'out' => 'carrier fee', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_country', 'type' => 'Int', 'out' => 'country', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_carrier', 'type' => 'Int', 'out' => 'carrier', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_group', 'type' => 'ArrayWithIds', 'out' => 'group', 'multilang' => 0, 'req' => 0),
+        array('name' => 'test_categoryBox', 'type' => 'ArrayWithIds', 'out' => 'categories', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_manufacturers', 'type' => 'ArrayWithIdsWithZero', 'out' => 'manufacturers', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_suppliers', 'type' => 'ArrayWithIdsWithZero', 'out' => 'suppliers', 'multilang' => 0, 'req' => 0),
+    );
+    private $_validateConfigFormValues = array(
+        array('name' => 'CODWFEEPLUS_AUTO_UPDATE', 'type' => 'Int', 'out' => 'auto update', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_INTEGRATION_WAY', 'type' => 'Int', 'out' => 'integration', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_PRODUCT_TITLE', 'type' => 'Text', 'out' => 'product name', 'multilang' => 1, 'req' => 1),
+        array('name' => 'CODWFEEPLUS_PRODUCT_REFERENCE', 'type' => 'Text', 'out' => 'product reference', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_KEEPTRANSACTIONS', 'type' => 'Int', 'out' => 'store orders', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_BEHAVIOUR', 'type' => 'Int', 'out' => 'behavior', 'multilang' => 0, 'req' => 0),
+    );
 
     public function __construct()
     {
@@ -63,73 +108,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
     public function initContent()
     {
-//        $this->fooData(30);
-//        $this->fooData_trans(100);
-//        $this->updateproducts();
         $this->show_toolbar = true;
         $this->meta_title = $this->l('COD with Fee Plus');
         parent::initContent();
     }
-
-//    private function updateproducts() {
-//        $pr = Product::getProducts($this->context->language->id, 0, 0, 'id_product', 'asc');
-//        foreach ($pr as $val) {
-//            if (StockAvailable::getQuantityAvailableByProduct($val['id_product']) < 5) {
-//                StockAvailable::setQuantity($val['id_product'], 0, 5);
-//                StockAvailable::setProductOutOfStock($val['id_product'], true);
-//            }
-//        }
-//    }
-//    private function fooData($incount) {
-//        if (is_null($incount)) {
-//            $incount = 10;
-//        }
-//        for ($index = 0; $index < $incount; $index++) {
-//            $cond = new CODwFP();
-//            $cond->codwfeeplus_desc = 'Sample No' . $index;
-//            $cond->codwfeeplus_active = 1;
-//            $cond->codwfeeplus_fee = rand(0, 100);
-//            $cond->codwfeeplus_fee_max = rand(0, 100);
-//            $cond->codwfeeplus_fee_min = rand(0, 100);
-//            $cond->codwfeeplus_fee_percent = rand(0, 100);
-//            $cond->codwfeeplus_fee_type = rand(0, 3);
-//            $cond->saveToDB();
-//        }
-//    }
-//    private function fooData_trans($incount) {
-//        if (is_null($incount)) {
-//            $incount = 10;
-//        }
-//        for ($index = 0; $index < $incount; $index++) {
-//            $codwfeeplus_result = '<p>Test result</p>';
-//            $codwfeeplus_customer_id = rand(1, 50);
-//            $codwfeeplus_order_id = rand(1, 40);
-//            $codwfeeplus_fee = rand(1, 100);
-//            $codwfeeplus_cart_total = rand(50, 500);
-//            $codwfeeplus_datetime = $this->randomDate('1-1-2018', '31-8-2018');
-//            $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'codwfeeplus_transactions` (`codwfeeplus_result`,`codwfeeplus_datetime`,`codwfeeplus_customer_id`,' .
-//                    '`codwfeeplus_order_id`,`codwfeeplus_fee`,`codwfeeplus_cart_total`)' .
-//                    ' VALUES(' .
-//                    '\'' . pSQL($codwfeeplus_result, true) . '\',' .
-//                    '\'' . pSQL($codwfeeplus_datetime) . '\',' .
-//                    (int) pSQL($codwfeeplus_customer_id) . ',' .
-//                    (int) pSQL($codwfeeplus_order_id) . ',' .
-//                    (float) pSQL($codwfeeplus_fee) . ',' .
-//                    (float) pSQL($codwfeeplus_cart_total) .
-//                    ')';
-//            $res = Db::getInstance()->execute($sql);
-//        }
-//    }
-//// Find a randomDate between $start_date and $end_date
-//    private function randomDate($start_date, $end_date) {
-//// Convert to timetamps
-//        $min = strtotime($start_date);
-//        $max = strtotime($end_date);
-//// Generate random number using above bounds
-//        $val = rand($min, $max);
-//// Convert back to desired date format
-//        return date('Y-m-d H:i:s', $val);
-//    }
 
     public function bulkDeleteOrders($id_array)
     {
@@ -519,7 +501,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret = null;
         if (is_array($param) && count($param)) {
             $ret = $param;
-            //countries
+//Fix description
+            $ret['codwfeeplus_description'] = stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret['codwfeeplus_description']))));
+//countries
             if (isset($ret['codwfeeplus_countries'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_countries']);
                 $arr2 = array();
@@ -532,7 +516,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_countries'] = CODwFP::arrayToString($arr2);
             }
-            //zones
+//zones
             if (isset($ret['codwfeeplus_zones'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_zones']);
                 $arr2 = array();
@@ -545,11 +529,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_zones'] = CODwFP::arrayToString($arr2);
             }
-            //carriers
+//carriers
             if (isset($ret['codwfeeplus_carriers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_carriers']);
                 $arr2 = array();
-                $carriers = Carrier::getCarriers($this->context->language->id, true);
+                $carriers = CarrierCore::getCarriers($this->context->language->id, true);
                 $carriers_id = array_column($carriers, 'id_carrier');
                 foreach ($arr as $value) {
                     if (in_array($value, $carriers_id)) {
@@ -558,7 +542,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_carriers'] = CODwFP::arrayToString($arr2);
             }
-            //groups
+//groups
             if (isset($ret['codwfeeplus_groups'])) {
                 if (Group::isFeatureActive()) {
                     $arr = CODwFP::stringToArray($ret['codwfeeplus_groups']);
@@ -575,7 +559,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     $ret['codwfeeplus_groups'] = '';
                 }
             }
-            //categories
+//categories
             if (isset($ret['codwfeeplus_categories'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_categories']);
                 $arr2 = array();
@@ -588,7 +572,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_categories'] = CODwFP::arrayToString($arr2);
             }
-            //manufacturers
+//manufacturers
             if (isset($ret['codwfeeplus_manufacturers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_manufacturers']);
                 $arr2 = array();
@@ -601,7 +585,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_manufacturers'] = CODwFP::arrayToString($arr2);
             }
-            //suppliers
+//suppliers
             if (isset($ret['codwfeeplus_suppliers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_suppliers']);
                 $arr2 = array();
@@ -834,6 +818,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'cur_version' => '',
             'download_link' => '',
             'info_link' => Configuration::get('SG_CODWFEEPLUS_INFO_LINK'),
+            'github_link' => Configuration::get('SG_CODWFEEPLUS_GITHUB_LINK'),
             'out' => '',
         );
         if ($check_update) {
@@ -843,6 +828,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 $update_status['cur_version'] = $this->module->_updatestatus['cur_version'];
                 $update_status['download_link'] = $this->module->_updatestatus['download_link'];
                 $update_status['info_link'] = $this->module->_updatestatus['info_link'];
+                $update_status['github_link'] = $this->module->_updatestatus['github_link'];
             } else {
                 $update_status['res'] = 'error';
                 if ($ret == 'error_res') {
@@ -855,7 +841,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             }
         }
         $this->context->smarty->assign(array(
-            'help_title' => $this->l('HELP'),
+            'help_title' => $this->l('INFO'),
             'help_sub' => $this->l('click to toggle'),
             'module_name' => $this->module->displayName,
             'module_version' => $this->module->version,
@@ -921,7 +907,12 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
-        $manufacturers_list = array();
+        $manufacturers_list = array(
+            0 => array(
+                'id_option' => 0,
+                'name' => $this->l('Empty manufacturer'),
+            )
+        );
         $manufacturers = Manufacturer::getManufacturers();
         foreach ($manufacturers as $value) {
             $manufacturers_list[] = array(
@@ -930,7 +921,12 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
-        $suppliers_list = array();
+        $suppliers_list = array(
+            0 => array(
+                'id_option' => 0,
+                'name' => $this->l('Empty supplier'),
+            )
+        );
         $suppliers = Supplier::getSuppliers();
         foreach ($suppliers as $value) {
             $suppliers_list[] = array(
@@ -1101,8 +1097,8 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'tstfrm_cartvalue' => Tools::getValue('tstfrm_cartvalue', 0),
             'tstfrm_carriervalue' => Tools::getValue('tstfrm_carriervalue', 0),
             'tstfrm_category' => $cat,
-            'tstfrm_manufacturers[]' => Tools::getValue('tstfrm_manufacturers', 0),
-            'tstfrm_suppliers[]' => Tools::getValue('tstfrm_suppliers', 0),
+            'tstfrm_manufacturers[]' => Tools::getValue('tstfrm_manufacturers', -1),
+            'tstfrm_suppliers[]' => Tools::getValue('tstfrm_suppliers', -1),
         );
 
         return $ret;
@@ -1174,7 +1170,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
-                        'label' => $this->l('Intergration'),
+                        'label' => $this->l('Integration global'),
                         'name' => 'CODWFEEPLUS_INTEGRATION_WAY',
                         'options' => array(
                             'query' => $options_integration,
@@ -1808,7 +1804,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret1 = array(
             'id_codwfeeplus_cond' => array('title' => $this->l('ID'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_desc' => array('title' => $this->l('Condition description'), 'type' => 'text', 'orderby' => false),
-            'codwfeeplus_integration' => array('title' => $this->l('Integration'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_integration' => array('title' => $this->l('Integration list'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_tax' => array('title' => $this->l('Product Tax'), 'type' => 'percent', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
             'codwfeeplus_fee_type' => array('title' => $this->l('Type'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_fee' => array('title' => $this->l('Fee'), 'type' => 'price', 'currency' => true, 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
@@ -1840,7 +1836,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
 //FORM
     public function renderFormConditions($in_cond_id = null, $getfrompost = false)
     {
-        //        $this->addJS(_PS_BO_ALL_THEMES_DIR_ . 'default/js/tree.js');
+//        $this->addJS(_PS_BO_ALL_THEMES_DIR_ . 'default/js/tree.js');
         $carriers = Carrier::getCarriers($this->context->language->id);
         $carriers_list = array();
         foreach ($carriers as $value) {
@@ -1873,7 +1869,12 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
 
         $manufacturers = ManufacturerCore::getManufacturers();
-        $manufacturers_list = array();
+        $manufacturers_list = array(
+            0 => array(
+                'id_option' => 0,
+                'name' => $this->l('Empty manufacturer'),
+            )
+        );
         foreach ($manufacturers as $value) {
             $manufacturers_list[] = array(
                 'id_option' => (int) $value['id_manufacturer'],
@@ -1882,7 +1883,12 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
 
         $suppliers = SupplierCore::getSuppliers();
-        $suppliers_list = array();
+        $suppliers_list = array(
+            0 => array(
+                'id_option' => 0,
+                'name' => $this->l('Empty supplier'),
+            )
+        );
         foreach ($suppliers as $value) {
             $suppliers_list[] = array(
                 'id_option' => (int) $value['id_supplier'],
@@ -2009,7 +2015,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
-                        'label' => $this->l('Integration'),
+                        'label' => $this->l('Integration form'),
                         'name' => 'CODWFEEPLUS_INTEGRATION',
                         'options' => array(
                             'query' => $options_integration,
@@ -2394,7 +2400,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
     protected function getFieldsValuesConditions($in_cond_id = null, $getfrompost = false)
     {
-        $ret = array('form', 'categories');
+        $ret = array();
         if (!$getfrompost) {
             $cond = new CODwFP($in_cond_id);
             $ret['form'] = array(
@@ -2657,184 +2663,111 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
     private function _validate_testForm()
     {
-        $this->_errors = array();
-        $ret = true;
-
-        $test_categoryBox = Tools::getValue('test_categoryBox');
-        if ($test_categoryBox) {
-            if (!Validate::isArrayWithIds($test_categoryBox)) {
-                $this->_errors[] = $this->l('Invalid categories value.');
-                $ret &= false;
-            }
-        }
-
-        $tstfrm_group = Tools::getValue('tstfrm_group');
-        if ($tstfrm_group) {
-            if (!Validate::isArrayWithIds($tstfrm_group)) {
-                $this->_errors[] = $this->l('Invalid groups value.');
-                $ret &= false;
-            }
-        }
-
-        if (!Validate::isInt(Tools::getValue('tstfrm_country'))) {
-            $this->_errors[] = $this->l('Invalid country value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('tstfrm_carrier'))) {
-            $this->_errors[] = $this->l('Invalid carrier value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('tstfrm_shop'))) {
-            $this->_errors[] = $this->l('Invalid shop value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('tstfrm_cartvalue'))) {
-            $this->_errors[] = $this->l('Invalid total cart value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('tstfrm_carriervalue'))) {
-            $this->_errors[] = $this->l('Invalid carrier fee value.');
-            $ret &= false;
-        }
-        return $ret;
+        return $this->validateFormData($this->_validateTestFormValues);
     }
 
     private function _validate_conf()
     {
+        return $this->validateFormData($this->_validateConfigFormValues);
+    }
+
+    private function valInt($inVal)
+    {
+        return Validate::isInt($inVal);
+    }
+
+    private function valIntOrEmpty($inVal)
+    {
+        if ($inVal == '') {
+            return true;
+        } else {
+            return Validate::isInt($inVal);
+        }
+    }
+
+    private function valText($inVal)
+    {
+        return Validate::isCleanHtml($inVal);
+    }
+
+    private function valPrice($inVal)
+    {
+        return Validate::isPrice($inVal);
+    }
+
+    private function valPercentage($inVal)
+    {
+        return Validate::isPercentage($inVal);
+    }
+
+    private function valArrayWithIds($inVal)
+    {
+        return Validate::isArrayWithIds($inVal);
+    }
+
+    private function valArrayWithIdsWithZero($inVal)
+    {
+        return $this->isArrayWithIdsWithZero($inVal);
+    }
+
+    private function validateFormData($param)
+    {
         $this->_errors = array();
         $ret = true;
-        $conf_title = array();
-        foreach (Language::getLanguages(true) as $lang) {
-            $conf_title[$lang['id_lang']] = Tools::getValue('CODWFEEPLUS_PRODUCT_TITLE_' . $lang['id_lang']);
-            if ($conf_title[$lang['id_lang']] == '' || $conf_title[$lang['id_lang']] == null || !Validate::isCleanHtml($conf_title[$lang['id_lang']])) {
-                $this->_errors[] = sprintf($this->l('Invalid product title for %s language.'), $lang['name']);
-                $ret &= false;
+
+
+
+        foreach ($param as $value) {
+
+            if ($value['multilang']) {
+                $conf_title = array();
+                foreach (Language::getLanguages(true) as $lang) {
+                    $conf_title[$lang['id_lang']] = Tools::getValue($value['name'] . '_' . $lang['id_lang']);
+                    if ($conf_title[$lang['id_lang']] !== false) {
+                        if ($value['req'] && ($conf_title[$lang['id_lang']] == '' || $conf_title[$lang['id_lang']] == null)) {
+                            $this->_errors[] = sprintf('Empty value for language %s: %s', $lang['name'], $value['out']);
+                            $ret &= false;
+                        }
+                        $func = 'val' . $value['type'];
+                        if (!$this->$func($conf_title[$lang['id_lang']])) {
+                            $this->_errors[] = sprintf($this->l('Invalid product title for %s language.'), $lang['name']);
+                            $ret &= false;
+                        }
+                    }
+                }
+            } else {
+                $val = Tools::getValue($value['name']);
+                if ($val !== false) {
+                    if ($value['req'] && ($val == '' || $val == null)) {
+                        $this->_errors[] = sprintf('Empty value: %s', $value['out']);
+                        $ret &= false;
+                    }
+                    $func = 'val' . $value['type'];
+                    if (!$this->$func($val)) {
+                        $this->_errors[] = sprintf('Invalid value: %s', $value['out']);
+                        $ret &= false;
+                    }
+                }
             }
         }
-        $conf_ref = Tools::getValue('CODWFEEPLUS_PRODUCT_REFERENCE');
-        if ($conf_ref == '' || $conf_ref == null || !Validate::isCleanHtml($conf_ref)) {
-            $this->_errors[] = $this->l('Invalid product reference.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_INTEGRATION_WAY'))) {
-            $this->_errors[] = $this->l('Invalid integration way value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_MATCHALL_GROUPS'))) {
-            $this->_errors[] = $this->l('Invalid match all groups value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_AUTO_UPDATE'))) {
-            $this->_errors[] = $this->l('Invalid auto update value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_MATCHALL_CATEGORIES'))) {
-            $this->_errors[] = $this->l('Invalid match all categories value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_KEEPTRANSACTIONS'))) {
-            $this->_errors[] = $this->l('Invalid store orders value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_BEHAVIOUR'))) {
-            $this->_errors[] = $this->l('Invalid behaviour value.');
-            $ret &= false;
-        }
-
         return $ret;
     }
 
     private function _validate_cond()
     {
-        $this->_errors = array();
-        $ret = true;
-        $desc = Tools::getValue('CODWFEEPLUS_DESCRIPTION');
-        if ($desc) {
-            if (!Validate::isCleanHtml($desc)) {
-                $this->_errors[] = $this->l('Invalid description.');
-                $ret &= false;
-            }
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_FEETYPE'))) {
-            $this->_errors[] = $this->l('Invalid fee type value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_INTEGRATION'))) {
-            $this->_errors[] = $this->l('Invalid Integration value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_ACTIVE'))) {
-            $this->_errors[] = $this->l('Invalid active value.');
-            $ret &= false;
-        }
-        if (!Validate::isInt(Tools::getValue('CODWFEEPLUS_CARTVALUE_SIGN'))) {
-            $this->_errors[] = $this->l('Invalid cart value condition value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('CODWFEEPLUS_FEE'))) {
-            $this->_errors[] = $this->l('Invalid fixed fee value.');
-            $ret &= false;
-        }
-        if (!Validate::isPercentage(Tools::getValue('CODWFEEPLUS_PERCENTAGE'))) {
-            $this->_errors[] = $this->l('Invalid percentage value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('CODWFEEPLUS_MIN'))) {
-            $this->_errors[] = $this->l('Invalid minimum value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('CODWFEEPLUS_MAX'))) {
-            $this->_errors[] = $this->l('Invalid maximum value.');
-            $ret &= false;
-        }
-        if (!Validate::isPrice(Tools::getValue('CODWFEEPLUS_CARTVALUE'))) {
-            $this->_errors[] = $this->l('Invalid cart value, value.');
-            $ret &= false;
-        }
-        $carriers_arr = Tools::getValue('CODWFEEPLUS_DELIVERY_ARRAY');
-        if ($carriers_arr) {
-            if (!Validate::isArrayWithIds($carriers_arr)) {
-                $this->_errors[] = $this->l('Invalid carriers value.');
-                $ret &= false;
-            }
-        }
-        $countries_arr = Tools::getValue('CODWFEEPLUS_COUNTRIES_ARRAY');
-        if ($countries_arr) {
-            if (!Validate::isArrayWithIds($countries_arr)) {
-                $this->_errors[] = $this->l('Invalid countries value.');
-                $ret &= false;
-            }
-        }
-        $zones_arr = Tools::getValue('CODWFEEPLUS_ZONES_ARRAY');
-        if ($zones_arr) {
-            if (!Validate::isArrayWithIds($zones_arr)) {
-                $this->_errors[] = $this->l('Invalid zones value.');
-                $ret &= false;
-            }
-        }
-        $groups_arr = Tools::getValue('CODWFEEPLUS_GROUPS_ARRAY');
-        if ($groups_arr) {
-            if (!Validate::isArrayWithIds($groups_arr)) {
-                $this->_errors[] = $this->l('Invalid groups value.');
-                $ret &= false;
-            }
-        }
-        $shops_arr = Tools::getValue('CODWFEEPLUS_SHOPS_ARRAY');
-        if ($shops_arr) {
-            if (!Validate::isArrayWithIds($shops_arr)) {
-                $this->_errors[] = $this->l('Invalid shops value.');
-                $ret &= false;
-            }
-        }
-        $cat_arr = Tools::getValue('cond_categoryBox');
-        if ($cat_arr) {
-            if (!Validate::isArrayWithIds($cat_arr)) {
-                $this->_errors[] = $this->l('Invalid categories value.');
-                $ret &= false;
-            }
-        }
+        return $this->validateFormData($this->_validateCondFormValues);
+    }
 
-        return $ret;
+    private function isArrayWithIdsWithZero($ids)
+    {
+        if (count($ids)) {
+            foreach ($ids as $id) {
+                if (!Validate::isUnsignedInt($id)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 //Positions

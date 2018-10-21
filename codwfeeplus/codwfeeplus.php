@@ -25,7 +25,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 //use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-
 include_once _PS_MODULE_DIR_ . 'codwfeeplus/CODwFP.php';
 
 class codwfeeplus extends PaymentModule
@@ -41,8 +40,9 @@ class codwfeeplus extends PaymentModule
     public $_updatestatus = array(
         'res' => '',
         'cur_version' => '',
-        'download_link' => 'https://programs.sakgiok.gr/codwfeeplus/codwfeeplus_v1.0.7.zip',
-        'info_link' => 'https://sakgiok.gr',
+        'download_link' => '',
+        'info_link' => '',
+        'github_link' => '',
     );
     public $public_name = '';
     private $tab_name = '';
@@ -86,6 +86,9 @@ class codwfeeplus extends PaymentModule
             0 => 'add to carrier\'s fee',
             1 => 'add a COD product to the order',
         );
+        if (!$this->getProductStatus()) {
+            $this->warning = $this->l('COD Product was not found.');
+        }
     }
 
     public function installTab($parent, $class_name, $name)
@@ -137,7 +140,8 @@ class codwfeeplus extends PaymentModule
                 or ! Configuration::updateValue('SG_CODWFEEPLUS_PRODUCT_ID', 0)
                 or ! Configuration::updateValue('SG_CODWFEEPLUS_PRODUCT_REFERENCE', 'COD')
                 or ! Configuration::updateValue('SG_CODWFEEPLUS_AUTO_UPDATE', 0)
-                or ! Configuration::updateValue('SG_CODWFEEPLUS_INFO_LINK', 'https://sakgiok.gr')
+                or ! Configuration::updateValue('SG_CODWFEEPLUS_INFO_LINK', 'https://sakgiok.gr/programs/codwfeeplus/')
+                or ! Configuration::updateValue('SG_CODWFEEPLUS_GITHUB_LINK', 'https://github.com/sakgiok/codwfeeplus')
                 or ! Configuration::updateValue('SG_CODWFEEPLUS_LOGO_FILENAME_17', 'codwfeeplus_logo_17.png')
                 or ! Configuration::updateValue('SG_CODWFEEPLUS_LOGO_ENABLED', 0)
                 or ! $this->installMultiLangParameters()
@@ -164,6 +168,7 @@ class codwfeeplus extends PaymentModule
                 or ! Configuration::deleteByName('SG_CODWFEEPLUS_PRODUCT_REFERENCE')
                 or ! Configuration::deleteByName('SG_CODWFEEPLUS_AUTO_UPDATE')
                 or ! Configuration::deleteByName('SG_CODWFEEPLUS_INFO_LINK')
+                or ! Configuration::deleteByName('SG_CODWFEEPLUS_GITHUB_LINK')
                 or ! Configuration::deleteByName('SG_CODWFEEPLUS_LOGO_FILENAME_17')
                 or ! Configuration::deleteByName('SG_CODWFEEPLUS_LOGO_ENABLED')
                 or ! $this->uninstallTab('AdminCODwFeePlus')
@@ -641,12 +646,23 @@ class codwfeeplus extends PaymentModule
         $ret = array();
         $cart = new Cart($cart_id);
         $products = $cart->getProducts(true);
-        $manuf = Manufacturer::getManufacturers(true);
         foreach ($products as $product) {
-            foreach ($v as $value) {
-                if (!in_array($value['id_category'], $ret)) {
-                    $ret[] = $value['id_category'];
-                }
+            if (!in_array($product['id_manufacturer'], $ret)) {
+                $ret[] = $product['id_manufacturer'];
+            }
+        }
+
+        return $ret;
+    }
+
+    private function getSuppliersFromCart($cart_id)
+    {
+        $ret = array();
+        $cart = new Cart($cart_id);
+        $products = $cart->getProducts(true);
+        foreach ($products as $product) {
+            if (!in_array($product['id_supplier'], $ret)) {
+                $ret[] = $product['id_supplier'];
             }
         }
 
@@ -709,9 +725,13 @@ class codwfeeplus extends PaymentModule
     {
         $ret = array();
         foreach ($manufacturers_array as $value) {
-            $g = new Manufacturer($value);
-            $ret[] = $g->name;
-            unset($g);
+            if ($value == '0') {
+                $ret[] = $this->l('Empty manufacturer');
+            } else {
+                $g = new Manufacturer($value);
+                $ret[] = $g->name;
+                unset($g);
+            }
         }
 
         return $ret;
@@ -721,9 +741,13 @@ class codwfeeplus extends PaymentModule
     {
         $ret = array();
         foreach ($suppliers_array as $value) {
-            $g = new Supplier($value);
-            $ret[] = $g->name;
-            unset($g);
+            if ($value == '0') {
+                $ret[] = $this->l('Empty supplier');
+            } else {
+                $g = new Supplier($value);
+                $ret[] = $g->name;
+                unset($g);
+            }
         }
 
         return $ret;
@@ -743,8 +767,8 @@ class codwfeeplus extends PaymentModule
         if (Group::isFeatureActive()) {
             $cust_group = Customer::getGroupsStatic((int) $params['cart']->id_customer);
         }
-        $manufacturers = array();
-        $suppliers == array();
+        $manufacturers = $this->getManufacturersFromCart($params['cart']->id);
+        $suppliers = $this->getSuppliersFromCart($params['cart']->id);
 
         return $this->getCost_common($id_carrier, $id_country, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
     }
@@ -763,8 +787,8 @@ class codwfeeplus extends PaymentModule
         if (Group::isFeatureActive()) {
             $cust_group = Customer::getGroupsStatic((int) $cart->id_customer);
         }
-        $manufacturers = array();
-        $suppliers == array();
+        $manufacturers = $this->getManufacturersFromCart($cart->id);
+        $suppliers = $this->getSuppliersFromCart($cart->id);
 
         return $this->getCost_common($id_carrier, $id_country, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
     }
@@ -1312,9 +1336,13 @@ class codwfeeplus extends PaymentModule
         $i = 0;
         $inArr = explode('|', $inliststr);
         foreach ($inArr as $value) {
-            $c = new Manufacturer($value);
-            $ret .= ($i > 0 ? ' ,' : '') . $c->name;
-            unset($c);
+            if ($value == '0') {
+                $ret .= ($i > 0 ? ' ,' : '') . $this->l('Empty manufacturer');
+            } else {
+                $c = new Manufacturer($value);
+                $ret .= ($i > 0 ? ' ,' : '') . $c->name;
+                unset($c);
+            }
             ++$i;
         }
 
@@ -1327,9 +1355,13 @@ class codwfeeplus extends PaymentModule
         $i = 0;
         $inArr = explode('|', $inliststr);
         foreach ($inArr as $value) {
-            $c = new Supplier($value);
-            $ret .= ($i > 0 ? ' ,' : '') . $c->name;
-            unset($c);
+            if ($value == '0') {
+                $ret .= ($i > 0 ? ' ,' : '') . $this->l('Empty supplier');
+            } else {
+                $c = new Supplier($value);
+                $ret .= ($i > 0 ? ' ,' : '') . $c->name;
+                unset($c);
+            }
             ++$i;
         }
 
@@ -2117,12 +2149,18 @@ class codwfeeplus extends PaymentModule
                     $this->_updatestatus['cur_version'] = $arr['cur_version'];
                     $this->_updatestatus['download_link'] = $arr['download_link'];
                     $this->_updatestatus['info_link'] = $arr['info_link'];
+                    $this->_updatestatus['github_link'] = $arr['github_link'];
                     $ret = 'update';
+                    $this->updateValueAllShops('SG_CODWFEEPLUS_INFO_LINK', $this->_updatestatus['info_link']);
+                    $this->updateValueAllShops('SG_CODWFEEPLUS_GITHUB_LINK', $this->_updatestatus['github_link']);
                 } elseif ($arr['res'] == 'current') {
                     $this->_updatestatus['res'] = $arr['res'];
                     $this->_updatestatus['cur_version'] = $arr['cur_version'];
                     $this->_updatestatus['download_link'] = $arr['download_link'];
                     $this->_updatestatus['info_link'] = $arr['info_link'];
+                    $this->_updatestatus['github_link'] = $arr['github_link'];
+                    $this->updateValueAllShops('SG_CODWFEEPLUS_INFO_LINK', $this->_updatestatus['info_link']);
+                    $this->updateValueAllShops('SG_CODWFEEPLUS_GITHUB_LINK', $this->_updatestatus['github_link']);
                     $ret = 'current';
                 } else {
                     $ret = 'error_res';
@@ -2135,6 +2173,26 @@ class codwfeeplus extends PaymentModule
         }
 
         return $ret;
+    }
+
+    public function updateValueAllShops($key, $value)
+    {
+        $this->storeContextShop();
+        if (Shop::isFeatureActive()) {
+            Shop::setContext(Shop::CONTEXT_ALL);
+        }
+        $res = true;
+
+        if (Shop::isFeatureActive()) {
+            $shop_list = Shop::getShops(true, null, true);
+            foreach ($shop_list as $shop) {
+                Shop::setContext(Shop::CONTEXT_SHOP, $shop);
+                $res &= Configuration::updateValue($key, $value);
+            }
+        } else {
+            $res &= Configuration::updateValue($key, $value);
+        }
+        $this->resetContextShop();
     }
 
 }

@@ -324,7 +324,11 @@ class CODwFP
 
     public static function stringToArray($instr)
     {
-        return explode('|', $instr);
+        if ($instr === '') {
+            return array();
+        } else {
+            return explode('|', $instr);
+        }
     }
 
     public function getMaxPosition($shop_id = null)
@@ -449,27 +453,37 @@ class CODwFP
         }
         //manufacturers
         if ($this->codwfeeplus_manufacturers != '') {
+            $mod = Module::getInstanceByName('codwfeeplus');
             $manufacturers_arr = $this->getManufacturersArray();
             $ret['manufacturers']['count'] = count($manufacturers_arr);
             $i = 0;
             $ret['manufacturers']['matchall'] = $this->codwfeeplus_matchall_manufacturers;
             foreach ($manufacturers_arr as $value) {
-                $o = new Manufacturer($value);
-                $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
-                unset($o);
+                if ($value == '0') {
+                    $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $mod->l('Empty manufacturer');
+                } else {
+                    $o = new Manufacturer($value);
+                    $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
+                    unset($o);
+                }
                 ++$i;
             }
         }
         //suppliers
         if ($this->codwfeeplus_suppliers != '') {
+            $mod = Module::getInstanceByName('codwfeeplus');
             $suppliers_arr = $this->getSuppliersArray();
             $ret['suppliers']['count'] = count($suppliers_arr);
             $i = 0;
             $ret['suppliers']['matchall'] = $this->codwfeeplus_matchall_suppliers;
             foreach ($suppliers_arr as $value) {
-                $o = new Supplier($value);
-                $ret['suppliers']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
-                unset($o);
+                if ($value == '0') {
+                    $ret['suppliers']['title'] .= ($i > 0 ? '<br/>' : '') . $mod->l('Empty supplier');
+                } else {
+                    $o = new Supplier($value);
+                    $ret['suppliers']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
+                    unset($o);
+                }
                 ++$i;
             }
         }
