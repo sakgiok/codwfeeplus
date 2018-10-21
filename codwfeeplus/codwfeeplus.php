@@ -582,9 +582,33 @@ class codwfeeplus extends PaymentModule
         if (!$this->active) {
             return;
         }
+        
+        $fee = $this->getCost($params);
+        $integration = Configuration::get('SG_CODWFEEPLUS_INTEGRATION_WAY');
+        $cond_integration = $this->_cond_integration;
+        $integration_product = false;
+        if ($integration == 0) {
+            //By condition
+            if ($cond_integration == 1 && $fee != 0) {
+                $integration_product = true;
+            }
+        } elseif ($integration == 2 && $CODfee != 0) {
+            $integration_product = true;
+        }
+
+        $product_valid = $this->getProductStatus();
+
+        if (!$product_valid && $integration_product) {
+            return false;
+        }
+
+// Check if cart has product download
+        if ($this->hasProductDownload($params['cart'])) {
+            return false;
+        }
 
         $this->context->smarty->assign(array(
-            'fee' => number_format($this->getCost($params), 2, '.', ''),
+            'fee' => number_format($fee, 2, '.', ''),
         ));
 
         $payment_options = [$this->getPaymentOptionValue()];
@@ -609,16 +633,32 @@ class codwfeeplus extends PaymentModule
             return;
         }
 
+        $fee = $this->getCost($params);
+        $integration = Configuration::get('SG_CODWFEEPLUS_INTEGRATION_WAY');
+        $cond_integration = $this->_cond_integration;
+        $integration_product = false;
+        if ($integration == 0) {
+            //By condition
+            if ($cond_integration == 1 && $fee != 0) {
+                $integration_product = true;
+            }
+        } elseif ($integration == 2 && $CODfee != 0) {
+            $integration_product = true;
+        }
+
+        $product_valid = $this->getProductStatus();
+
+        if (!$product_valid && $integration_product) {
+            return false;
+        }
+
 // Check if cart has product download
         if ($this->hasProductDownload($params['cart'])) {
             return false;
         }
 
         $this->smarty->assign(array(
-            'this_path' => $this->_path,
-            'fee' => number_format($this->getCost($params), 2, '.', ''),
-            'this_path_cod' => $this->_path,
-            'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
+            'fee' => number_format($fee, 2, '.', ''),
         ));
 
         return $this->display(__FILE__, 'payment.tpl');
