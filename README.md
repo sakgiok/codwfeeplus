@@ -2,7 +2,7 @@
 A prestashop module for implementing Cash On Delivery with a fee with a lot of options.
 ## Features
 * Compatible with multiple currencies and multiple shops
-* Able to either integrate the COD fee with the Carrier's fee, or add a dummy product in the order to reflect the fee with configurable tax.
+* Ability to either integrate the COD fee with the Carrier's fee, or add a dummy product in the order to reflect the fee with configurable tax.
 * Many parameters to check for in order to apply the fee (cart total, delivery country, delivery zone, carrier, customer group, product categories, manufacturers, suppliers).
 * Many ways to calculate the fee (fixed value, percentage of the cart value or a combination of the two).
 * All parameters are defined in conditions, which each calculates a fee if is validated. You can choose to use the first one that was validated, or add all of the successful ones to define the fee.
