@@ -1,0 +1,58 @@
+/** Copyright 2018 Sakis Gkiokas
+ *
+ * This file is part of codwfeeplus module for Prestashop.
+ *
+ * Codwfeeplus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codwfeeplus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * For any recommendations and/or suggestions please contact me
+ * at sakgiok@gmail.com
+ *
+ *  @author    Sakis Gkiokas <sakgiok@gmail.com>
+ *  @copyright 2018 Sakis Gkiokas
+ *  @license   https://opensource.org/licenses/GPL-3.0  GNU General Public License version 3
+ */
+
+p.payment_module a.codwfeeplus_payment {
+        background: url(../img/codwfeeplus.png) 15px 12px no-repeat #fbfbfb;
+    display: block;
+    border: 1px solid #d6d4d4;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    font-size: 17px;
+    line-height: 23px;
+    color: #333;
+    font-weight: bold;
+    padding: 33px 40px 34px 99px;
+    letter-spacing: -1px;
+    position: relative;
+}
+
+p.payment_module a.codwfeeplus_payment span.price {
+    font-size: 17px;
+}
+p.payment_module a.codwfeeplus_payment:after {
+    display: block;
+    content: "\f054";
+    position: absolute;
+    right: 15px;
+    margin-top: -11px;
+    top: 50%;
+    font-family: "FontAwesome";
+    font-size: 25px;
+    height: 22px;
+    width: 14px;
+    color: #777;
+}
+
+p.payment_module a.codwfeeplus_payment:hover {
+    background-color: #f6f6f6;
+}

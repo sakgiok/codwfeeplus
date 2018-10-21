@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+<name>codwfeeplus</name>
+    <displayName><![CDATA[Cash on delivery with fee (COD) PLUS]]></displayName>
+    <version><![CDATA[1.0.7]]></version>
+    <description><![CDATA[Accept cash on delivery payments with extra fee and more options]]></description>
+    <author><![CDATA[Sakis Gkiokas]]></author>
+    <tab><![CDATA[payments_gateways]]></tab>
+    <is_configurable>0</is_configurable>
+    <need_instance>1</need_instance>
+    <limited_countries></limited_countries>
+</module>

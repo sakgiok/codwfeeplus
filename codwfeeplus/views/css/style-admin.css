@@ -1,0 +1,320 @@
+/** Copyright 2018 Sakis Gkiokas
+ *
+ * This file is part of codwfeeplus module for Prestashop.
+ *
+ * Codwfeeplus is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codwfeeplus is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * For any recommendations and/or suggestions please contact me
+ * at sakgiok@gmail.com
+ *
+ *  @author    Sakis Gkiokas <sakgiok@gmail.com>
+ *  @copyright 2018 Sakis Gkiokas
+ *  @license   https://opensource.org/licenses/GPL-3.0  GNU General Public License version 3
+ */
+
+.codwfeeplus_testoutput{
+    display: block;
+    font-size: 1em;
+    color: #000;
+    white-space: normal;
+}
+.codwfeeplus_testoutput p, .codwfeeplus_testoutput ul{
+    margin: 0;
+}
+.codwfeeplus_parameters, .codwfeeplus_fee_calc, .codwfeeplus_cond_passed, .codwfeeplus_cond_failed, .codwfeeplus_cond_warning{
+    margin: 1em 0;
+}
+.codwfeeplus_parameters, .codwfeeplus_fee_calc{
+    display: block;
+    background-color: #e5e5ff;
+    padding: 0 0 0 4em;
+}
+
+.codwfeeplus_parameters ul,.codwfeeplus_parameters ul ul, .codwfeeplus_fee_calc ul{
+    list-style: none;
+}
+.codwfeeplus_parameters ul li:before, .codwfeeplus_fee_calc ul li:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+    font-weight:900;
+}
+
+.codwfeeplus_parameters ul ul li:before, .codwfeeplus_fee_calc ul ul li:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+}
+
+.codwfeeplus_parameters:before, .codwfeeplus_fee_calc:before{
+    content: "";
+    margin: -0.15em 0 0 -1em;
+    font-family: FontAwesome;
+    font-size: 3.5em;
+    float: left;
+    color: #b8b8e8;
+}
+
+.codwfeeplus_cond_passed p, .codwfeeplus_cond_failed p, .codwfeeplus_cond_warning p{
+    font-style: italic;
+}
+
+.codwfeeplus_cond_passed{
+    display: block;
+    background-color: #e5ffe5;
+    padding: 0 0 0 4em;
+}
+
+.codwfeeplus_cond_passed:before{
+    content: "";
+    margin: -0.15em 0 0 -1em;
+    font-family: FontAwesome;
+    font-size: 3.5em;
+    float: left;
+    color: #b8e8b8;
+}
+
+.codwfeeplus_cond_failed{
+    display: block;
+    background-color: #ffe5e5;
+    padding: 0 0 0 4em;
+}
+.codwfeeplus_cond_failed:before{
+    content: "";
+    margin: -0.15em 0 0 -1em;
+    font-family: FontAwesome;
+    font-size: 3.5em;
+    float: left;
+    color: #e8b8b8;
+}
+
+.codwfeeplus_cond_warning{
+    display: block;
+    background-color: #ffffe5;
+    padding: 0 0 0 4em;
+    min-height: 3.5em;
+}
+
+.codwfeeplus_cond_warning:before{
+    content: "";
+    margin: -0.15em 0 0 -1em;
+    font-family: FontAwesome;
+    font-size: 3.5em;
+    float: left;
+    color: #e8e8b8;
+}
+
+.codwfeeplus_result{
+    display: block;
+}
+
+@media(max-width: 991px){
+
+    .codwfeeplus_result .codwfeeplus_cond_passed:before,
+    .codwfeeplus_result .codwfeeplus_cond_failed:before,
+    .codwfeeplus_result .codwfeeplus_cond_warning:before,
+    .codwfeeplus_result .codwfeeplus_parameters:before,
+    .codwfeeplus_result .codwfeeplus_fee_calc:before {
+        margin: 0.35em 0 0 -1em;
+    }
+
+    .codwfeeplus_cond_passed:before,
+    .codwfeeplus_cond_failed:before,
+    .codwfeeplus_cond_warning:before,
+    .codwfeeplus_parameters:before,
+    .codwfeeplus_fee_calc:before {
+        margin: -0.15em 0 0 -1em;
+    }
+
+    .codwfeeplus_result{
+        margin-left: -53%;
+    }
+}
+
+.codwfeeplus_cond_passed .codwfeeplus_cond_check_steps{
+    background-color: #d4ffd4;
+}
+.codwfeeplus_cond_failed .codwfeeplus_cond_check_steps{
+    background-color: #ffd4d4;
+}
+.codwfeeplus_cond_warning .codwfeeplus_cond_check_steps{
+    background-color: #ffffd4;
+}
+
+.codwfeeplus_cond_success {
+    list-style: none;
+    color: #00a000;
+}
+li.codwfeeplus_cond_success:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+}
+.codwfeeplus_cond_error{
+    list-style: none;
+    color: #a00000;
+}
+li.codwfeeplus_cond_error:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+}
+li.codwfeeplus_cond_neutral{
+    list-style: none;
+    color: #7d7d00;
+}
+li.codwfeeplus_cond_neutral:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+}
+
+.codwfeeplus_fee_calc_steps {
+    background-color: #d4ffd4;
+}
+
+.codwfeeplus_fee_calc_steps ul{
+    list-style: none;
+}
+
+.codwfeeplus_fee_calc_steps ul li:before{
+    content: "";
+    margin: 0 0.7em 0 -1.4em;
+    font-family: FontAwesome;
+    font-weight:900;
+}
+
+.codwfeeplus_bold_price {
+    font-weight: bold;
+    color: #5a5a5a;
+}
+
+.codwfeeplus_bold_txt {
+    font-weight: bold;
+    color: #5a5a5a;
+}
+
+.codwfeeplus_cond_success .codwfeeplus_bold_txt {
+    font-weight: bold;
+    color: #00a000;
+}
+
+.codwfeeplus_cond_success .codwfeeplus_bold_price {
+    font-weight: bold;
+    color: #00a000;
+}
+
+.codwfeeplus_cond_error .codwfeeplus_bold_txt {
+    font-weight: bold;
+    color: #a00000;
+}
+
+.codwfeeplus_cond_error .codwfeeplus_bold_price {
+    font-weight: bold;
+    color: #a00000;
+}
+
+.codwfeeplus_help_title{
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-top: 2em;
+    border-top: 1px solid #a9b8bd;
+    padding-top: 1.5em;
+}
+.codwfeeplus_help_body{
+    font-weight: normal;
+    font-size: 1em;
+}
+
+.codwfeeplus_productstatus{
+    display: inline-block;
+    border: solid 1px #c7d6db;
+    padding: 5px;
+}
+.codwfeeplus_productstatus p{
+    margin: 0;
+    padding: 0;
+}
+.codwfeeplus_productstatus_false {
+    background-color: #ffebeb;
+    padding: 5px;
+}
+
+.codwfeeplus_productstatus_true {
+    background-color: #ebffeb;
+    padding: 5px;
+}
+
+hr.codwfeeplus_form_hr{
+    border-top: 1px solid #c7d6db;
+    margin: 0;
+}
+
+.codwfeeplus_update_title_success{
+    color: #007b00;
+}
+.codwfeeplus_update_title_current{
+    color: #3b3bfb;
+}
+.codwfeeplus_update_title_error{
+    color: #c70000;
+}
+.codwfeeplus_update{
+
+}
+.codwfeeplus_update_out_current{
+    color: #3b3bfb;
+    margin: 0 0 1em 0;
+}
+.codwfeeplus_update_out_success{
+    color: #007b00;
+    margin: 0 0 1em 0;
+}
+.codwfeeplus_update_out_error{
+    color: #c70000;
+    margin: 0 0 1em 0;
+}
+.codwfeeplus_update_form{
+    margin: 0 0 1em 0;
+}
+.codwfeeplus_update_form button{
+    height: 3em;
+    width: 20em;
+}
+.codwfeeplus_condlist_mark{
+    color: #ff0000;
+    margin-left: 5px;
+    font-size: 14px;
+    line-height: 12px;
+}
+.codwfeeplus_condlist_tooltip{
+    text-decoration: none; 
+    color: #3586AE; 
+    background-color: #edf7fb; 
+    border: none;
+    border-bottom: solid 1px #D8EDF7;
+    padding: 0 5px; 
+    -webkit-border-radius: 3px; 
+    border-radius: 3px;
+}
+.codwfeeplus_conditions tbody td.codwfeeplus_nowrap{
+    white-space: nowrap;
+}
+
+p.codwfeeplus_nogroup_error{
+    font-size: 1.2em;
+    color: #a70000;
+}
+.codwfeeplus_logo_preview{
+    border: 1px solid #c7d6db;
+    float: left;
+    padding: 5px;
+}
