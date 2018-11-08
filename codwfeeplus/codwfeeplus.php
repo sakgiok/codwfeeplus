@@ -60,10 +60,15 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.7';
+        $this->version = '1.0.9';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
-        $this->controllers = array('validation');
+        if ($this->is17) {
+            $this->controllers = array('validation', 'ajax');
+        } else {
+            $this->controllers = array('validation');
+        }
+
         $this->is_eu_compatible = 1;
         $this->secure_key = Tools::encrypt($this->name);
         $this->currencies = true;
@@ -370,17 +375,21 @@ class codwfeeplus extends PaymentModule
             foreach ($shop_list as $value) {
                 Shop::setContext(Shop::CONTEXT_SHOP, $value);
                 $cod_product_id = Configuration::get('SG_CODWFEEPLUS_PRODUCT_ID');
-                $p = new Product((int) $cod_product_id);
-                $p->delete();
-                unset($p);
+                if ($cod_product_id != '0') {
+                    $p = new Product((int) $cod_product_id);
+                    $p->delete();
+                    unset($p);
+                }
                 $ret &= Configuration::updateValue('SG_CODWFEEPLUS_PRODUCT_ID', 0);
             }
             Shop::setContext(Shop::CONTEXT_ALL);
         }
         $cod_product_id = Configuration::get('SG_CODWFEEPLUS_PRODUCT_ID');
-        $p = new Product((int) $cod_product_id);
-        $p->delete();
-        unset($p);
+        if ($cod_product_id != '0') {
+            $p = new Product((int) $cod_product_id);
+            $p->delete();
+            unset($p);
+        }
         $ret &= Configuration::updateValue('SG_CODWFEEPLUS_PRODUCT_ID', 0);
 
         $this->resetContextShop();
@@ -554,7 +563,12 @@ class codwfeeplus extends PaymentModule
 
     public function hookHeader($params)
     {
-        $this->context->controller->addCSS($this->_path . 'views/css/style-front.css');
+        if ($this->is17) {
+            $this->context->controller->addCSS($this->_path . 'views/css/style-front_17.css');
+            $this->context->controller->addJS($this->_path . 'views/js/front.js');
+        } else {
+            $this->context->controller->addCSS($this->_path . 'views/css/style-front.css');
+        }
     }
 
     public function updateConditionsAfterCarrierUpdate($old_id, $new_id)
@@ -582,7 +596,7 @@ class codwfeeplus extends PaymentModule
         if (!$this->active) {
             return;
         }
-        
+
         $fee = $this->getCost($params);
         $integration = Configuration::get('SG_CODWFEEPLUS_INTEGRATION_WAY');
         $cond_integration = $this->_cond_integration;
@@ -607,8 +621,14 @@ class codwfeeplus extends PaymentModule
             return false;
         }
 
+        $link = new Link;
+        $parameters = array("action" => "getCartSummary");
+        $ajax_link = $link->getModuleLink($this->name, 'ajax', $parameters);
+
         $this->context->smarty->assign(array(
             'fee' => number_format($fee, 2, '.', ''),
+            'fee_formatted' => Tools::displayPrice($fee),
+            'ajax_link' => $ajax_link,
         ));
 
         $payment_options = [$this->getPaymentOptionValue()];
@@ -618,7 +638,8 @@ class codwfeeplus extends PaymentModule
     public function getPaymentOptionValue()
     {
         $pOption = new PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-        $pOption->setCallToActionText($this->l('Pay with Cash on Delivery'))
+        $pOption->setModuleName($this->name)
+                ->setCallToActionText($this->l('Pay with Cash on Delivery'))
                 ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
                 ->setAdditionalInformation($this->context->smarty->fetch('module:codwfeeplus/views/templates/hook/payment_infos.tpl'));
         if (Configuration::get('SG_CODWFEEPLUS_LOGO_ENABLED')) {

@@ -199,6 +199,7 @@ $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_55ea25e92e4f94d97f
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_4c2a8fe7eaf24721cc7a9f0175115bd4'] = 'Message';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_2d4c6d5cd4bc7690ba75ae6aa4fbe344'] = 'This content is only available when a store is selected in a multistore installation.';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_a457034b0e47194e0c9904bb5206359c'] = 'The module is not active. Please activate it.';
+$_MODULE['<{codwfeeplus}prestashop>ajax_b6f0f1fc3358d7ab19a49021689bf2b8'] = 'Cash on delivery fee';
 $_MODULE['<{codwfeeplus}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'This payment method is not available.';
 $_MODULE['<{codwfeeplus}prestashop>list_content_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Enabled';
 $_MODULE['<{codwfeeplus}prestashop>list_content_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabled';
