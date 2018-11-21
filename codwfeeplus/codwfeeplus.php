@@ -60,7 +60,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.9';
+        $this->version = '1.0.10';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -784,10 +784,14 @@ class codwfeeplus extends PaymentModule
 
     private function getManufacturersNameArray($manufacturers_array)
     {
+        $manuf_empty_label = $this->l('Empty manufacturer');
+        if ($this->is17) {
+            $manuf_empty_label = $this->l('Empty brand');
+        }
         $ret = array();
         foreach ($manufacturers_array as $value) {
             if ($value == '0') {
-                $ret[] = $this->l('Empty manufacturer');
+                $ret[] = $manuf_empty_label;
             } else {
                 $g = new Manufacturer($value);
                 $ret[] = $g->name;
@@ -911,7 +915,11 @@ class codwfeeplus extends PaymentModule
         }
         $this->_testoutput .= '</li>';
 
-        $this->_testoutput .= '<li>Manufacturers: ';
+        if ($this->is17) {
+            $this->_testoutput .= '<li>Brands: ';
+        } else {
+            $this->_testoutput .= '<li>Manufacturers: ';
+        }
         $man_names = $this->getManufacturersNameArray($manufacturers_array);
         if (count($man_names)) {
             $this->_testoutput .= '<ul>';
@@ -920,7 +928,11 @@ class codwfeeplus extends PaymentModule
             }
             $this->_testoutput .= '</ul>';
         } else {
-            $this->_testoutput .= '<span class="codwfeeplus_bold_txt">No manufacturers defined.</span>';
+            if ($this->is17) {
+                $this->_testoutput .= '<span class="codwfeeplus_bold_txt">No brands defined.</span>';
+            } else {
+                $this->_testoutput .= '<span class="codwfeeplus_bold_txt">No manufacturers defined.</span>';
+            }
         }
         $this->_testoutput .= '</li>';
 
@@ -1109,15 +1121,31 @@ class codwfeeplus extends PaymentModule
             if ($cond['codwfeeplus_manufacturers'] !== '') {
                 $v = $this->manufacturersArrToText($cond['codwfeeplus_manufacturers']);
                 $t = $this->checkMultipleValuesListID($cond['codwfeeplus_manufacturers'], $manufacturers_array, $cond['codwfeeplus_matchall_manufacturers']);
-                $multitext = $cond['codwfeeplus_matchall_manufacturers'] ? '(All submitted manufacturers should match)' : '(Any submitted manufacturer should match)';
-                if ($t) {
-                    $this->_testoutput_check .= '<li class="codwfeeplus_cond_success">Submitted manufacturers matched condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                if ($this->is17) {
+                    $multitext = $cond['codwfeeplus_matchall_manufacturers'] ? '(All submitted brands should match)' : '(Any submitted brand should match)';
                 } else {
-                    $this->_testoutput_check .= '<li class="codwfeeplus_cond_error">Submitted manufacturers didn\'t match condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                    $multitext = $cond['codwfeeplus_matchall_manufacturers'] ? '(All submitted manufacturers should match)' : '(Any submitted manufacturer should match)';
+                }
+                if ($t) {
+                    if ($this->is17) {
+                        $this->_testoutput_check .= '<li class="codwfeeplus_cond_success">Submitted brands matched condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                    } else {
+                        $this->_testoutput_check .= '<li class="codwfeeplus_cond_success">Submitted manufacturers matched condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                    }
+                } else {
+                    if ($this->is17) {
+                        $this->_testoutput_check .= '<li class="codwfeeplus_cond_error">Submitted brands didn\'t match condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                    } else {
+                        $this->_testoutput_check .= '<li class="codwfeeplus_cond_error">Submitted manufacturers didn\'t match condition\'s groups ' . $multitext . ' -> ' . $v . '.</li>';
+                    }
                 }
                 $apply_cond &= $t;
             } else {
-                $this->_testoutput_check .= '<li class="codwfeeplus_cond_neutral">Condition doesn\'t have any manufacturers defined.</li>';
+                if ($this->is17) {
+                    $this->_testoutput_check .= '<li class="codwfeeplus_cond_neutral">Condition doesn\'t have any brands defined.</li>';
+                } else {
+                    $this->_testoutput_check .= '<li class="codwfeeplus_cond_neutral">Condition doesn\'t have any manufacturers defined.</li>';
+                }
             }
 
             if ($cond['codwfeeplus_suppliers'] !== '') {
@@ -1393,12 +1421,16 @@ class codwfeeplus extends PaymentModule
 
     private function manufacturersArrToText($inliststr)
     {
+        $manuf_empty_label = $this->l('Empty manufacturer');
+        if ($this->is17) {
+            $manuf_empty_label = $this->l('Empty brand');
+        }
         $ret = '';
         $i = 0;
         $inArr = explode('|', $inliststr);
         foreach ($inArr as $value) {
             if ($value == '0') {
-                $ret .= ($i > 0 ? ' ,' : '') . $this->l('Empty manufacturer');
+                $ret .= ($i > 0 ? ' ,' : '') . $manuf_empty_label;
             } else {
                 $c = new Manufacturer($value);
                 $ret .= ($i > 0 ? ' ,' : '') . $c->name;

@@ -502,7 +502,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (is_array($param) && count($param)) {
             $ret = $param;
 //Fix description
-            $ret['codwfeeplus_description'] = stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret['codwfeeplus_description']))));
+            $ret['codwfeeplus_desc'] = stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret['codwfeeplus_desc']))));
 //countries
             if (isset($ret['codwfeeplus_countries'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_countries']);
@@ -533,7 +533,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             if (isset($ret['codwfeeplus_carriers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_carriers']);
                 $arr2 = array();
-                $carriers = CarrierCore::getCarriers($this->context->language->id, true);
+                $carriers = Carrier::getCarriers($this->context->language->id, false, false, false, null, Carrier::ALL_CARRIERS);
                 $carriers_id = array_column($carriers, 'id_carrier');
                 foreach ($arr as $value) {
                     if (in_array($value, $carriers_id)) {
@@ -868,7 +868,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
     public function renderTestForm($hide = true)
     {
         $test_field_values = $this->getTestFieldsValues();
-        $carriers = Carrier::getCarriers($this->context->language->id);
+        $carriers = Carrier::getCarriers($this->context->language->id, false, false, false, null, Carrier::ALL_CARRIERS);
         $carriers_list = array();
         foreach ($carriers as $value) {
             $carriers_list[] = array(
@@ -907,10 +907,18 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
+        $emptyManuf_text = $this->l('Empty manufacturer');
+        $manuf_label = $this->l('Cart Manufacturers');
+        $manuf_hint = $this->l('The manufacturers of the products in the cart.');
+        if ($this->module->is17) {
+            $emptyManuf_text = $this->l('Empty brand');
+            $manuf_label = $this->l('Cart Brands');
+            $manuf_hint = $this->l('The brands of the products in the cart.');
+        }
         $manufacturers_list = array(
             0 => array(
                 'id_option' => 0,
-                'name' => $this->l('Empty manufacturer'),
+                'name' => $emptyManuf_text,
             )
         );
         $manufacturers = Manufacturer::getManufacturers();
@@ -1016,14 +1024,14 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     array(
                         'type' => 'select',
                         'multiple' => true,
-                        'label' => $this->l('Cart Manufacturers'),
+                        'label' => $manuf_label,
                         'name' => 'tstfrm_manufacturers[]',
                         'options' => array(
                             'query' => $manufacturers_list,
                             'id' => 'id_option',
                             'name' => 'name',
                         ),
-                        'hint' => $this->l('The manufacturers of the products in the cart.'),
+                        'hint' => $manuf_hint,
                     ),
                     array(
                         'type' => 'select',
@@ -1821,9 +1829,13 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (Group::isFeatureActive()) {
             $ret1['codwfeeplus_groups'] = array('title' => $this->l('Groups'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false);
         }
+        $manuf_label = $this->l('Manufacturers');
+        if ($this->module->is17) {
+            $manuf_label = $this->l('Brands');
+        }
         $ret2 = array(
             'codwfeeplus_categories' => array('title' => $this->l('Categories'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_manufacturers' => array('title' => $this->l('Manufacturers'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_manufacturers' => array('title' => $manuf_label, 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_suppliers' => array('title' => $this->l('Suppliers'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_active' => array('title' => $this->l('Active'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'orderby' => false),
             'position' => array('title' => $this->l('Position'), 'position' => 'true', 'align' => 'center', 'orderby' => true),
@@ -1837,7 +1849,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
     public function renderFormConditions($in_cond_id = null, $getfrompost = false)
     {
 //        $this->addJS(_PS_BO_ALL_THEMES_DIR_ . 'default/js/tree.js');
-        $carriers = Carrier::getCarriers($this->context->language->id);
+        $carriers = Carrier::getCarriers($this->context->language->id, false, false, false, null, Carrier::ALL_CARRIERS);
         $carriers_list = array();
         foreach ($carriers as $value) {
             $carriers_list[] = array(
@@ -1868,11 +1880,24 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
+        $emptyManuf_text = $this->l('Empty manufacturer');
+        $manuf_label = $this->l('Cart Manufacturers');
+        $manuf_hint = $this->l('The manufacturers of the products in the cart.');
+        $manuf_matchall_label = $this->l('Match all manufacturers');
+        $manuf_matchall_hint = $this->l('Toggle whether to match all the manufacturers of the cart, to the manufacturers selected in a condition. If disabled, even if only one manufacturer matches the condition manufacturers, this step of validation will be passed.');
+        if ($this->module->is17) {
+            $emptyManuf_text = $this->l('Empty brand');
+            $manuf_label = $this->l('Cart Brands');
+            $manuf_hint = $this->l('The brands of the products in the cart.');
+            $manuf_matchall_label = $this->l('Match all brands');
+            $manuf_matchall_hint = $this->l('Toggle whether to match all the brands of the cart, to the brands selected in a condition. If disabled, even if only one brand matches the condition brands, this step of validation will be passed.');
+        }
+
         $manufacturers = ManufacturerCore::getManufacturers();
         $manufacturers_list = array(
             0 => array(
                 'id_option' => 0,
-                'name' => $this->l('Empty manufacturer'),
+                'name' => $emptyManuf_text,
             )
         );
         foreach ($manufacturers as $value) {
@@ -2307,10 +2332,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'label' => '',
             'name' => 'sep',
         );
+
         $fields_form['form']['input'][] = array(
             'type' => 'select',
             'multiple' => true,
-            'label' => $this->l('Manufacturers List'),
+            'label' => $manuf_label,
             'name' => 'CODWFEEPLUS_MANUFACTURERS_ARRAY[]',
             'class' => 'fixed-width-lg',
             'desc' => $this->l('Select one or more manufacturers to aplly this Fee'),
@@ -2319,11 +2345,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'id' => 'id_option',
                 'name' => 'name',
             ),
-            'hint' => $this->l('Select (using the Control key) none, one or more manufacturers from the list.'),
+            'hint' => $manuf_hint,
         );
         $fields_form['form']['input'][] = array(
             'type' => 'switch',
-            'label' => $this->l('Match all manufacturers'),
+            'label' => $manuf_matchall_label,
             'name' => 'CODWFEEPLUS_MATCHALL_MANUFACTURERS',
             'is_bool' => true,
             'values' => array(
@@ -2334,7 +2360,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     'value' => 0,
                 ),
             ),
-            'hint' => $this->l('Toggle whether to match all the manufacturers of the cart, to the manufacturers selected in a condition. If disabled, even if only one manufacturer matches the condition manufacturers, this step of validation will be passed.'),
+            'hint' => $manuf_matchall_hint,
         );
         $fields_form['form']['input'][] = array(
             'type' => 'html',
