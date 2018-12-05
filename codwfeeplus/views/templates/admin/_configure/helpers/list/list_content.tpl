@@ -159,7 +159,7 @@
 			{assign var='compiled_actions' value=array()}
 			{foreach $actions AS $key => $action}
 				{if isset($tr.$action)}
-					{if  $key== 0}
+					{if $key == 0}
 						{assign var='action' value=$action}
 					{/if}
 					{if $action == 'delete' && $actions|@count > 2}
@@ -192,6 +192,7 @@
 		</td>
 	{/if}
 	</tr>
+        {if isset($tr.id_codwfeeplus_trans) && isset($tr.codwfeeplus_result)}
         <tr>
             <td colspan="{count($fields_display)+$cols}">
                 <div class="codwfeeplus_result" id="codwfeeplus_result_{$tr.id_codwfeeplus_trans}" style="display: none;">
@@ -199,6 +200,7 @@
                 </div>
             <td>
         </tr>
+        {/if}
 {/foreach}
 {else}
 	<tr>

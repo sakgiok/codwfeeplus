@@ -22,6 +22,9 @@
 $(document).ready(function () {
 
     function replace_cart_summary(cod_active) {
+        if (!$("#codwfeeplus_payment_infos").length){
+            return;
+        }
         var cart_summary = $("#js-checkout-summary");
         var cart_table = $("#order-items");
         var _url = $("#codwfeeplus_payment_infos").attr("data-ajaxurl");

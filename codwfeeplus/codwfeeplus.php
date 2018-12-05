@@ -35,6 +35,7 @@ class codwfeeplus extends PaymentModule
     public $_testoutput = '';
     public $_testoutput_check = '';
     public $_testoutput_applyfee = '';
+    public $_testoutput_method_active = true;
     public $_cond_integration = '';
     public $_cond_taxrule = 0;
     public $_updatestatus = array(
@@ -60,7 +61,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.10';
+        $this->version = '1.1.0';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -460,6 +461,7 @@ class codwfeeplus extends PaymentModule
                           `codwfeeplus_integration` int(2) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_taxrule_id` int(2) unsigned NOT NULL DEFAULT \'0\',
 			  `codwfeeplus_active` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
+                          `codwfeeplus_condtype` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_fee_percent_include_carrier` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_cartvalue_include_carrier` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_position` int(10) unsigned NOT NULL,
@@ -598,6 +600,10 @@ class codwfeeplus extends PaymentModule
         }
 
         $fee = $this->getCost($params);
+
+        if (!$this->_testoutput_method_active) {
+            return false;
+        }
         $integration = Configuration::get('SG_CODWFEEPLUS_INTEGRATION_WAY');
         $cond_integration = $this->_cond_integration;
         $integration_product = false;
@@ -606,7 +612,7 @@ class codwfeeplus extends PaymentModule
             if ($cond_integration == 1 && $fee != 0) {
                 $integration_product = true;
             }
-        } elseif ($integration == 2 && $CODfee != 0) {
+        } elseif ($integration == 2 && $fee != 0) {
             $integration_product = true;
         }
 
@@ -655,6 +661,11 @@ class codwfeeplus extends PaymentModule
         }
 
         $fee = $this->getCost($params);
+
+        if (!$this->_testoutput_method_active) {
+            return false;
+        }
+
         $integration = Configuration::get('SG_CODWFEEPLUS_INTEGRATION_WAY');
         $cond_integration = $this->_cond_integration;
         $integration_product = false;
@@ -663,7 +674,7 @@ class codwfeeplus extends PaymentModule
             if ($cond_integration == 1 && $fee != 0) {
                 $integration_product = true;
             }
-        } elseif ($integration == 2 && $CODfee != 0) {
+        } elseif ($integration == 2 && $fee != 0) {
             $integration_product = true;
         }
 
@@ -869,11 +880,13 @@ class codwfeeplus extends PaymentModule
                 $where_shop = ' WHERE `codwfeeplus_shop`=' . Shop::getContextShopID();
             }
         }
+        $this->_testoutput_method_active = true;
         $conds_db = Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . 'codwfeeplus_conditions`' . $where_shop . ' ORDER BY `codwfeeplus_position`');
         $curr = Currency::getDefaultCurrency();
         $c = $curr->suffix;
         unset($curr);
         $this->_testoutput = '<div class="codwfeeplus_testoutput">';
+        $this->_testoutput .= '<span style="display: none;">Output from COD with fee PLUS module for Prestasop&COPY; by Sakis Gkiokas, version: ' . $this->version . '</span>';
         $this->_testoutput .= '<div class="codwfeeplus_parameters">'
                 . '<p>Integration way is <span class="codwfeeplus_bold_txt">' . $this->_integration_general_arr[$global_integration_way] . '</span>.</p>'
                 . '<p>Started checking with these parameters:</p>'
@@ -953,23 +966,38 @@ class codwfeeplus extends PaymentModule
 
         if ($conds_db) {
             foreach ($conds_db as $cond) {
+                $cond_type_fee = true;
+                $cond_type_txt = 'Type: <span class="codwfeeplus_bold_txt">FEE CALCULATION</span>';
+                if ($cond['codwfeeplus_condtype'] != 0) {
+                    $cond_type_fee = false;
+                    $cond_type_txt = 'Type: <span class="codwfeeplus_bold_txt">PAYMENT METHOD DEACTIVATION</span>';
+                }
                 $cond_valid = $this->checkCondValid($cond, $id_carrier, $id_country, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop);
                 $this->_testoutput .= '<div class="codwfeeplus_' . ($cond_valid ? 'cond_passed' : 'cond_failed') . '">'
-                        . '<p>Checking condition with id# <span class="codwfeeplus_bold_txt">' . $cond['id_codwfeeplus_cond'] . '</span></p>';
+                        . '<p>Checking condition with id# <span class="codwfeeplus_bold_txt">' . $cond['id_codwfeeplus_cond'] . '</span>. ' . $cond_type_txt . '</p>';
                 $this->_testoutput .= $this->_testoutput_check;
                 if ($cond_valid) {
-                    $this->_testoutput .= '<p>Condition passed validation. Calculating fee...</p>';
-                    $fee = $this->getConditionFee($cond, $cartvalue, $carriervalue);
-                    $this->_testoutput .= $this->_testoutput_applyfee;
-                    $this->_testoutput .= '<p>Fee calculated from this condition: <span class="codwfeeplus_bold_price">' . Tools::displayPrice($fee) . '</span></p>';
-                    $fee_arr[] = array(
-                        'fee' => $fee,
-                        'id' => $cond['id_codwfeeplus_cond'],
-                        'integration' => $cond['codwfeeplus_integration'],
-                        'taxrule_id' => $cond['codwfeeplus_taxrule_id'],
-                    );
+                    if ($cond_type_fee) {
+                        $this->_testoutput .= '<p>Condition passed validation. Calculating fee...</p>';
+                        $fee = $this->getConditionFee($cond, $cartvalue, $carriervalue);
+                        $this->_testoutput .= $this->_testoutput_applyfee;
+                        $this->_testoutput .= '<p>Fee calculated from this condition: <span class="codwfeeplus_bold_price">' . Tools::displayPrice($fee) . '</span></p>';
+                        $fee_arr[] = array(
+                            'fee' => $fee,
+                            'id' => $cond['id_codwfeeplus_cond'],
+                            'integration' => $cond['codwfeeplus_integration'],
+                            'taxrule_id' => $cond['codwfeeplus_taxrule_id'],
+                        );
+                    } else {
+                        $this->_testoutput .= '<p class="codwfeeplus_output_alert">Condition passed validation. Payment method will be unavailable...</p>';
+                        $this->_testoutput_method_active = false;
+                    }
                 } else {
-                    $this->_testoutput .= '<p>Condition did not pass validation.</p>';
+                    if ($cond_type_fee) {
+                        $this->_testoutput .= '<p>Condition did not pass validation.</p>';
+                    } else {
+                        $this->_testoutput .= '<p>Condition did not pass validation. Payment method will be available...</p>';
+                    }
                 }
 
                 $this->_testoutput .= '</div>';
@@ -980,62 +1008,68 @@ class codwfeeplus extends PaymentModule
                     . '</div>';
         }
 
-        $this->_testoutput .= '<div class="codwfeeplus_fee_calc"><p>Calculating final fee to apply...</p>';
-        if (Configuration::get('SG_CODWFEEPLUS_BEHAVIOUR') == 0) { //First fee in the list
-            $this->_testoutput .= '<div><p>Applying the first condition that succeeded validation.</p>';
-            if (count($fee_arr)) {
-                $ret = $fee_arr[0]['fee'];
-                $this->_testoutput .= '<p>Condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span> is used with fee <span class="codwfeeplus_bold_price">' . Tools::displayPrice($ret) . '</span>.</p>';
-            } else {
-                $this->_testoutput .= '<p>No condition passed validation so fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span>.</p>';
-            }
-            $this->_testoutput .= '</div>';
-        } else {
-            $this->_testoutput .= '<div><p>Adding all the fees returned from conditions that succeeded validation.</p>';
-            if (count($fee_arr)) {
-                $this->_testoutput .= '<ul>';
-                foreach ($fee_arr as $value) {
-                    $ret += $value['fee'];
-                    $this->_testoutput .= '<li>Added resulting fee of <span class="codwfeeplus_bold_price">' . Tools::displayPrice($value['fee']) . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $value['id'] . '</span>.</li>';
-                }
-                $this->_testoutput .= '</ul>';
-                $this->_testoutput .= '<p>Final fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice($ret) . '</span>.</p>';
-            } else {
-                $this->_testoutput .= '<p>No condition passed validation so fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span>.</p>';
-            }
-            $this->_testoutput .= '</div>';
-        }
-
-        $this->_testoutput .= '<div class="codwfeeplus_integration_calc">';
-        if ($ret == 0) {
-            $this->_cond_integration = 0;
-            $this->_testoutput .= '<p>Calculated fee value is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span> so integration way is not applied.</p>';
-        } else {
-            if ($global_integration_way != 0) { //not defined by condition
-                $this->_cond_integration = $global_integration_way - 1;
-                $this->_testoutput .= '<p>Integration way is defined globally as <span class="codwfeeplus_bold_txt">' . $this->_integration_general_arr[$global_integration_way] . '</span>.</p>';
-            } else {
+        if ($this->_testoutput_method_active) {
+            $this->_testoutput .= '<div class="codwfeeplus_fee_calc"><p>Calculating final fee to apply...</p>';
+            if (Configuration::get('SG_CODWFEEPLUS_BEHAVIOUR') == 0) { //First fee in the list
+                $this->_testoutput .= '<div><p>Applying the first condition that succeeded validation.</p>';
                 if (count($fee_arr)) {
-                    $this->_cond_integration = $fee_arr[0]['integration'];
-                    $this->_testoutput .= '<p>Integration way is defined from the first successful condition (<span class="codwfeeplus_bold_txt">' . $this->_integration_condition_arr[$fee_arr[0]['integration']] . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span>).</p>';
+                    $ret = $fee_arr[0]['fee'];
+                    $this->_testoutput .= '<p>Condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span> is used with fee <span class="codwfeeplus_bold_price">' . Tools::displayPrice($ret) . '</span>.</p>';
                 } else {
-                    $this->_cond_integration = 0;
-                    $this->_testoutput .= '<p>No conditions passed validation so integration way is not applied.</p>';
+                    $this->_testoutput .= '<p>No condition passed validation so fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span>.</p>';
+                }
+                $this->_testoutput .= '</div>';
+            } else {
+                $this->_testoutput .= '<div><p>Adding all the fees returned from conditions that succeeded validation.</p>';
+                if (count($fee_arr)) {
+                    $this->_testoutput .= '<ul>';
+                    foreach ($fee_arr as $value) {
+                        $ret += $value['fee'];
+                        $this->_testoutput .= '<li>Added resulting fee of <span class="codwfeeplus_bold_price">' . Tools::displayPrice($value['fee']) . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $value['id'] . '</span>.</li>';
+                    }
+                    $this->_testoutput .= '</ul>';
+                    $this->_testoutput .= '<p>Final fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice($ret) . '</span>.</p>';
+                } else {
+                    $this->_testoutput .= '<p>No condition passed validation so fee is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span>.</p>';
+                }
+                $this->_testoutput .= '</div>';
+            }
+
+            $this->_testoutput .= '<div class="codwfeeplus_integration_calc">';
+            if ($ret == 0) {
+                $this->_cond_integration = 0;
+                $this->_testoutput .= '<p>Calculated fee value is <span class="codwfeeplus_bold_price">' . Tools::displayPrice('0') . '</span> so integration way is not applied.</p>';
+            } else {
+                if ($global_integration_way != 0) { //not defined by condition
+                    $this->_cond_integration = $global_integration_way - 1;
+                    $this->_testoutput .= '<p>Integration way is defined globally as <span class="codwfeeplus_bold_txt">' . $this->_integration_general_arr[$global_integration_way] . '</span>.</p>';
+                } else {
+                    if (count($fee_arr)) {
+                        $this->_cond_integration = $fee_arr[0]['integration'];
+                        $this->_testoutput .= '<p>Integration way is defined from the first successful condition (<span class="codwfeeplus_bold_txt">' . $this->_integration_condition_arr[$fee_arr[0]['integration']] . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span>).</p>';
+                    } else {
+                        $this->_cond_integration = 0;
+                        $this->_testoutput .= '<p>No conditions passed validation so integration way is not applied.</p>';
+                    }
                 }
             }
-        }
-        $this->_testoutput .= '</div>';
+            $this->_testoutput .= '</div>';
 
-        if ($this->_cond_integration == 1) {
-            $this->_testoutput .= '<div class="codwfeeplus_taxrule_calc">';
-            $this->_cond_taxrule = $fee_arr[0]['taxrule_id'];
-            $rule_name = $this->getTaxRuleNameFromID($this->_cond_taxrule);
-            $this->_testoutput .= '<p>Tax for COD product is defined from the first successful condition (<span class="codwfeeplus_bold_txt">' . $rule_name . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span>).</p>';
+            if ($this->_cond_integration == 1) {
+                $this->_testoutput .= '<div class="codwfeeplus_taxrule_calc">';
+                $this->_cond_taxrule = $fee_arr[0]['taxrule_id'];
+                $rule_name = $this->getTaxRuleNameFromID($this->_cond_taxrule);
+                $this->_testoutput .= '<p>Tax for COD product is defined from the first successful condition (<span class="codwfeeplus_bold_txt">' . $rule_name . '</span> from condition with id <span class="codwfeeplus_bold_txt">' . $fee_arr[0]['id'] . '</span>).</p>';
+                $this->_testoutput .= '</div>';
+            }
+
+            $this->_testoutput .= '</div>';
+            $this->_testoutput .= '</div>';
+        } else {
+            $this->_testoutput .= '<div class="codwfeeplus_fee_calc">';
+            $this->_testoutput .= '<p class="codwfeeplus_output_alert">Payment method will be unavailable...</p>';
             $this->_testoutput .= '</div>';
         }
-
-        $this->_testoutput .= '</div>';
-        $this->_testoutput .= '</div>';
 
         return Tools::ps_round((float) $ret, _PS_PRICE_COMPUTE_PRECISION_);
     }

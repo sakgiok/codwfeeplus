@@ -36,6 +36,7 @@
     display: block;
     background-color: #e5e5ff;
     padding: 0 0 0 4em;
+    min-height: 3.8em;
 }
 
 .codwfeeplus_parameters ul,.codwfeeplus_parameters ul ul, .codwfeeplus_fee_calc ul{
@@ -63,6 +64,9 @@
     color: #b8b8e8;
 }
 
+.codwfeeplus_output_alert{
+    color: red;
+}
 .codwfeeplus_cond_passed p, .codwfeeplus_cond_failed p, .codwfeeplus_cond_warning p{
     font-style: italic;
 }
@@ -71,6 +75,7 @@
     display: block;
     background-color: #e5ffe5;
     padding: 0 0 0 4em;
+    min-height: 3.8em;
 }
 
 .codwfeeplus_cond_passed:before{
@@ -86,6 +91,7 @@
     display: block;
     background-color: #ffe5e5;
     padding: 0 0 0 4em;
+    min-height: 3.8em;
 }
 .codwfeeplus_cond_failed:before{
     content: "";
@@ -296,14 +302,17 @@ hr.codwfeeplus_form_hr{
     line-height: 12px;
 }
 .codwfeeplus_condlist_tooltip{
-    text-decoration: none; 
-    color: #3586AE; 
-    background-color: #edf7fb; 
+    text-decoration: none;
+    color: #3586AE;
+    background-color: #edf7fb;
     border: none;
     border-bottom: solid 1px #D8EDF7;
-    padding: 0 5px; 
-    -webkit-border-radius: 3px; 
+    padding: 0 5px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
     border-radius: 3px;
+    -webkit-box-shadow: #a3c0ca -2px 2px 4px 0px;
+    box-shadow: -2px 2px 4px 0px #a3c0ca;
 }
 .codwfeeplus_conditions tbody td.codwfeeplus_nowrap{
     white-space: nowrap;
@@ -317,4 +326,51 @@ p.codwfeeplus_nogroup_error{
     border: 1px solid #c7d6db;
     float: left;
     padding: 5px;
+}
+
+.bootstrap .prestashop-switch.codwfeeplus-switch-light {
+    height: auto;
+    display: flex;
+    align-items: center;
+}
+.bootstrap .prestashop-switch.codwfeeplus-switch-light + p {
+    clear: left;
+}
+.bootstrap .prestashop-switch.switch-light.codwfeeplus-switch-light input:checked~a {
+    border: 1px solid #279cbb;
+    background-color: #2eacce;
+    -webkit-box-shadow: #279cbb 0 -1px 0 inset;
+    box-shadow: inset 0 -1px 0 #279cbb;
+}
+
+.bootstrap .prestashop-switch.switch-light.codwfeeplus-switch-light input:last-of-type:checked~a {
+    border: 1px solid #a97f4d;
+    background-color: #d4a061;
+    -webkit-box-shadow: #a97f4d 0 -1px 0 inset;
+    box-shadow: inset 0 -1px 0 #a97f4d;
+}
+
+.bootstrap .prestashop-switch.switch-light.codwfeeplus-switch-light label {
+    padding: 5px;
+    line-height: 2em;
+}
+
+.codwfeeplus_list_cell_hidden{
+    display: none;
+}
+.codwfeeplus_list_notavail i {
+    color: #b77025;
+    text-shadow: -2px 3px 4px #bbb785;
+}
+.bootstrap .table tbody>tr.codwfeeplus_condlist_type_fee>td {
+    background-color: #deeefd;
+}
+.bootstrap .table tbody>tr.codwfeeplus_condlist_type_fee:hover>td {
+    background-color: #c9e1f7;
+}
+.bootstrap .table tbody>tr.codwfeeplus_condlist_type_paymethod>td {
+    background-color: #fff8ab;
+}
+.bootstrap .table tbody>tr.codwfeeplus_condlist_type_paymethod:hover>td {
+    background-color: #f1e775;
 }

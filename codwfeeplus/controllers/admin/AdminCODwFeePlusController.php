@@ -46,8 +46,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
     private $_configform_hideable = false;
     private $_defCurrencySuffix = '';
     private $_checkupdate = false;
+    private $_def_NA_icon = '<span class="codwfeeplus_list_notavail"><i class="icon-ban"></i></span>';
     private $_validateCondFormValues = array(
         array('name' => 'CODWFEEPLUS_ACTIVE', 'type' => 'Int', 'out' => 'active', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_CONDTYPE', 'type' => 'Int', 'out' => 'active', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_DESCRIPTION', 'type' => 'Text', 'out' => 'description', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_INTEGRATION', 'type' => 'Int', 'out' => 'integration', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_TAXRULE', 'type' => 'Int', 'out' => 'tax rule', 'multilang' => 0, 'req' => 0),
@@ -1674,6 +1676,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $helper->name_controller = Tools::getValue('controller');
         $helper->controller_name = $this->controller_name;
         $helper->bootstrap = $this->bootstrap;
+        $helper->override_folder = '_configure/';
 
         return $helper->generateList($values, $this->getConditionList());
     }
@@ -1710,19 +1713,57 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $tax_rule = $value['codwfeeplus_taxrule_id'];
 
             $c = new CODwFP($value['id_codwfeeplus_cond']);
+            $condtype = $c->codwfeeplus_condtype;
             $val_array = $c->getArrayForList((int) $this->context->language->id);
             $val_array_includecarrierfee = $c->getArrayCarrierFeeIncludedForList();
+            $val_id = array(
+                'id' => $value['id_codwfeeplus_cond'],
+                'condtype' => $condtype,
+            );
+            $val_feetype = array(
+                'val' => $type_desc[$value['codwfeeplus_fee_type']],
+                'condtype' => $condtype,
+            );
+            $val_integration = array(
+                'val' => $integration_desc[$value['codwfeeplus_integration']],
+                'condtype' => $condtype,
+            );
+            $val_tax = array(
+                'val' => $tax_rule != 0 ? number_format($tax_array[$tax_rule], 2, '.', '') : $tax_array[$tax_rule],
+                'condtype' => $condtype,
+            );
+            $val_fee = array(
+                'val' => $value['codwfeeplus_fee'],
+                'condtype' => $condtype,
+            );
+            $val_feemin = array(
+                'val' => $value['codwfeeplus_fee_min'],
+                'condtype' => $condtype,
+            );
+            $val_feemax = array(
+                'val' => $value['codwfeeplus_fee_max'],
+                'condtype' => $condtype,
+            );
+            $val_feepercent = array(
+                'val' => $val_array_includecarrierfee['codwfeeplus_fee_percent'],
+                'condtype' => $condtype,
+            );
+            $row_class = 'codwfeeplus_condlist_type_fee';
+            if ($c->codwfeeplus_condtype == 1) {
+                $row_class = 'codwfeeplus_condlist_type_paymethod';
+            }
             unset($c);
             $tmp = array(
                 'id_codwfeeplus_cond' => $value['id_codwfeeplus_cond'],
+                'id_codwfeeplus_cond_array' => $val_id,
                 'codwfeeplus_desc' => $value['codwfeeplus_desc'],
-                'codwfeeplus_fee_type' => $type_desc[$value['codwfeeplus_fee_type']],
-                'codwfeeplus_integration' => $integration_desc[$value['codwfeeplus_integration']],
-                'codwfeeplus_tax' => $tax_rule != 0 ? number_format($tax_array[$tax_rule], 2, '.', '') : $tax_array[$tax_rule],
-                'codwfeeplus_fee' => $value['codwfeeplus_fee'],
-                'codwfeeplus_fee_min' => $value['codwfeeplus_fee_min'],
-                'codwfeeplus_fee_max' => $value['codwfeeplus_fee_max'],
-                'codwfeeplus_fee_percent' => $val_array_includecarrierfee['codwfeeplus_fee_percent'],
+                'codwfeeplus_fee_type' => $val_feetype,
+                'codwfeeplus_integration' => $val_integration,
+                'codwfeeplus_tax' => $val_tax,
+                'codwfeeplus_fee' => $val_fee,
+                'codwfeeplus_fee_min' => $val_feemin,
+                'codwfeeplus_fee_max' => $val_feemax,
+                'codwfeeplus_fee_percent' => $val_feepercent,
                 'codwfeeplus_cartvalue_sign' => $cartvaluesign_arr[$value['codwfeeplus_cartvalue_sign']],
                 'codwfeeplus_cartvalue' => $val_array_includecarrierfee['codwfeeplus_cartvalue'],
                 'codwfeeplus_countries' => $val_array['countries'],
@@ -1733,6 +1774,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'codwfeeplus_categories' => $val_array['categories'],
                 'codwfeeplus_active' => $value['codwfeeplus_active'],
                 'position' => $value['codwfeeplus_position'],
+                'class' => $row_class,
             );
             if (Group::isFeatureActive()) {
                 $tmp['codwfeeplus_groups'] = $val_array['groups'];
@@ -1743,7 +1785,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $conds;
     }
 
-    public function callbackCondListTooltip($param)
+    public function callbackCondListTooltip_lists($param)
     {
         $ret = '';
         $tooltip = '';
@@ -1776,7 +1818,54 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-    public function callbackCondListTooltip_includecarrierfee($param)
+    public function callbackCondListTooltip_idandtype($param)
+    {
+        $ret = '';
+        $tooltip = $this->l('This condition is used to calculate fee.');
+        $text = $param['id'];
+
+        if ($param['condtype'] == 1) {
+            $tooltip = $this->l('This condition is used to define if module will be active.');
+        }
+        $ret = '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
+                . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip . '">'
+                . $text
+                . '</span>';
+
+        return $ret;
+    }
+
+    public function callbackCondListTooltip_feepercent($param)
+    {
+        $ret = '';
+        $val = '';
+        $decimal = 2;
+        $tooltip_text_no = $this->l('Carrier\'s fee is not included to the calculation.');
+        $tooltip_text_yes = $this->l('Carrier\'s fee is included to the calculation.');
+        $tooltip_text = '';
+        $mark = '';
+
+        if ($param['val']['carrierfeeincluded'] == 0) {
+            $tooltip_text = $tooltip_text_no;
+        } else {
+            $tooltip_text = $tooltip_text_yes;
+            $mark = '<span class="codwfeeplus_condlist_mark">*</span>';
+        }
+
+        $val = number_format(Tools::ps_round((float) $param['val']['value'], $decimal), 2, '.', '') . ' %';
+        if ($param['condtype'] == 0) {
+            $ret = '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
+                    . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip_text . '">'
+                    . $val . $mark
+                    . '</span>';
+        } else {
+            $ret = $this->_def_NA_icon;
+        }
+
+        return $ret;
+    }
+
+    public function callbackCondListTooltip_cartvalue($param)
     {
         $ret = '';
         $val = '';
@@ -1807,36 +1896,94 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
+    public function callbackCondListTooltip_integration($param)
+    {
+        $ret = '';
+        $text = '';
+        if ($param['condtype'] == 0) {
+            $text = $param['val'];
+        } else {
+            $text = $this->_def_NA_icon;
+        }
+        $ret = $text;
+        return $ret;
+    }
+
+    public function callbackCondListTooltip_tax($param)
+    {
+        $ret = '';
+        $text = '';
+        $decimal = 2;
+        if ($param['condtype'] == 0) {
+            if ($param['val'] == '--') {
+                $text = $param['val'];
+            } else {
+                $text = number_format(Tools::ps_round((float) $param['val'], $decimal), 2, '.', '') . ' %';
+            }
+        } else {
+            $text = $this->_def_NA_icon;
+        }
+        $ret = $text;
+        return $ret;
+    }
+
+    public function callbackCondListTooltip_feetype($param)
+    {
+        $ret = '';
+        $text = '';
+        if ($param['condtype'] == 0) {
+            $text = $param['val'];
+        } else {
+            $text = $this->_def_NA_icon;
+        }
+        $ret = $text;
+        return $ret;
+    }
+
+    public function callbackCondListTooltip_fee($param)
+    {
+        $ret = '';
+        $text = '';
+        if ($param['condtype'] == 0) {
+            $text = Tools::displayPrice($param['val']);
+        } else {
+            $text = $this->_def_NA_icon;
+        }
+        $ret = $text;
+        return $ret;
+    }
+
     public function getConditionList()
     {
         $ret1 = array(
-            'id_codwfeeplus_cond' => array('title' => $this->l('ID'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'id_codwfeeplus_cond' => array('title' => $this->l('ID'), 'class' => 'codwfeeplus_list_cell_hidden', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'id_codwfeeplus_cond_array' => array('title' => $this->l('ID'), 'callback' => 'callbackCondListTooltip_idandtype', 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_desc' => array('title' => $this->l('Condition description'), 'type' => 'text', 'orderby' => false),
-            'codwfeeplus_integration' => array('title' => $this->l('Integration list'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_tax' => array('title' => $this->l('Product Tax'), 'type' => 'percent', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_fee_type' => array('title' => $this->l('Type'), 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_fee' => array('title' => $this->l('Fee'), 'type' => 'price', 'currency' => true, 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_fee_percent' => array('title' => $this->l('Percent'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_includecarrierfee', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_fee_min' => array('title' => $this->l('Min Fee'), 'type' => 'price', 'currency' => true, 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_fee_max' => array('title' => $this->l('Max Fee'), 'type' => 'price', 'currency' => true, 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_integration' => array('title' => $this->l('Integration list'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_integration', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_tax' => array('title' => $this->l('Product Tax'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_tax', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_fee_type' => array('title' => $this->l('Type'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_feetype', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_fee' => array('title' => $this->l('Fee'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_fee', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_fee_percent' => array('title' => $this->l('Percent'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_feepercent', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_fee_min' => array('title' => $this->l('Min Fee'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_fee', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_fee_max' => array('title' => $this->l('Max Fee'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_fee', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
             'codwfeeplus_cartvalue_sign' => array('title' => $this->l('Cart Value condition'), 'type' => 'text', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_cartvalue' => array('title' => $this->l('Cart Value'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_includecarrierfee', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
-            'codwfeeplus_carriers' => array('title' => $this->l('Carriers'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_countries' => array('title' => $this->l('Countries'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_zones' => array('title' => $this->l('Zones'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_cartvalue' => array('title' => $this->l('Cart Value'), 'type' => 'text', 'callback' => 'callbackCondListTooltip_cartvalue', 'align' => 'center', 'orderby' => false, 'class' => 'codwfeeplus_nowrap'),
+            'codwfeeplus_carriers' => array('title' => $this->l('Carriers'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_countries' => array('title' => $this->l('Countries'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_zones' => array('title' => $this->l('Zones'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
         );
 
         if (Group::isFeatureActive()) {
-            $ret1['codwfeeplus_groups'] = array('title' => $this->l('Groups'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false);
+            $ret1['codwfeeplus_groups'] = array('title' => $this->l('Groups'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false);
         }
         $manuf_label = $this->l('Manufacturers');
         if ($this->module->is17) {
             $manuf_label = $this->l('Brands');
         }
         $ret2 = array(
-            'codwfeeplus_categories' => array('title' => $this->l('Categories'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_manufacturers' => array('title' => $manuf_label, 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
-            'codwfeeplus_suppliers' => array('title' => $this->l('Suppliers'), 'callback' => 'callbackCondListTooltip', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_categories' => array('title' => $this->l('Categories'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_manufacturers' => array('title' => $manuf_label, 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
+            'codwfeeplus_suppliers' => array('title' => $this->l('Suppliers'), 'callback' => 'callbackCondListTooltip_lists', 'type' => 'text', 'align' => 'center', 'orderby' => false),
             'codwfeeplus_active' => array('title' => $this->l('Active'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'orderby' => false),
             'position' => array('title' => $this->l('Position'), 'position' => 'true', 'align' => 'center', 'orderby' => true),
         );
@@ -1882,12 +2029,14 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $emptyManuf_text = $this->l('Empty manufacturer');
         $manuf_label = $this->l('Cart Manufacturers');
+        $manuf_desc = $this->l('Select one or more manufacturers to compare to the cart values');
         $manuf_hint = $this->l('The manufacturers of the products in the cart.');
         $manuf_matchall_label = $this->l('Match all manufacturers');
         $manuf_matchall_hint = $this->l('Toggle whether to match all the manufacturers of the cart, to the manufacturers selected in a condition. If disabled, even if only one manufacturer matches the condition manufacturers, this step of validation will be passed.');
         if ($this->module->is17) {
             $emptyManuf_text = $this->l('Empty brand');
             $manuf_label = $this->l('Cart Brands');
+            $manuf_desc = $this->l('Select one or more brands to compare to the cart values');
             $manuf_hint = $this->l('The brands of the products in the cart.');
             $manuf_matchall_label = $this->l('Match all brands');
             $manuf_matchall_hint = $this->l('Toggle whether to match all the brands of the cart, to the brands selected in a condition. If disabled, even if only one brand matches the condition brands, this step of validation will be passed.');
@@ -2031,6 +2180,26 @@ class AdminCODwFeePlusController extends ModuleAdminController
                             ),
                         ),
                         'hint' => $this->l('Toggle condition activation.'),
+                    ),
+                    array(
+                        'type' => 'switch_custom',
+                        'label' => $this->l('Type of condition'),
+                        'name' => 'CODWFEEPLUS_CONDTYPE',
+                        'cols' => 6,
+                        'desc' => $this->l('Select if the validation of the condition defines the fee or if it disables the payment method.'),
+                        'values' => array(
+                            array(
+                                'value' => 0,
+                                'label' => $this->l('FEE CALCULATION'),
+                                'id' => 'CODWFEEPLUS_CONDTYPE_0',
+                            ),
+                            array(
+                                'value' => 1,
+                                'label' => $this->l('MODULE ACTIVATION'),
+                                'id' => 'CODWFEEPLUS_CONDTYPE_1',
+                            ),
+                        ),
+                        'hint' => $this->l('When the condition validates, If the FEE CALCULATION is selected, the condition will calculate the fee. If MODULE ACTIVATION is selected and the condition is validated, the payment method will NOT be available in the front office.'),
                     ),
                     array(
                         'type' => 'text',
@@ -2184,7 +2353,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                         'label' => $this->l('Carriers List'),
                         'name' => 'CODWFEEPLUS_DELIVERY_ARRAY[]',
                         'class' => 'fixed-width-lg',
-                        'desc' => $this->l('Select one or more carriers to aplly this Fee'),
+                        'desc' => $this->l('Select one or more carriers to compare to the cart values'),
                         'options' => array(
                             'query' => $carriers_list,
                             'id' => 'id_option',
@@ -2205,7 +2374,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                         'label' => $this->l('Countries List'),
                         'name' => 'CODWFEEPLUS_COUNTRIES_ARRAY[]',
                         'class' => 'fixed-width-lg',
-                        'desc' => $this->l('Select one or more countries to aplly this Fee'),
+                        'desc' => $this->l('Select one or more countries to compare to the cart values'),
                         'options' => array(
                             'query' => $country_list,
                             'id' => 'id_option',
@@ -2226,7 +2395,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                         'label' => $this->l('Zone List'),
                         'name' => 'CODWFEEPLUS_ZONES_ARRAY[]',
                         'class' => 'fixed-width-lg',
-                        'desc' => $this->l('Select one or more zones to aplly this Fee'),
+                        'desc' => $this->l('Select one or more zones to compare to the cart values'),
                         'options' => array(
                             'query' => $zones_list,
                             'id' => 'id_option',
@@ -2255,7 +2424,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'label' => $this->l('Groups List'),
                 'name' => 'CODWFEEPLUS_GROUPS_ARRAY[]',
                 'class' => 'fixed-width-lg',
-                'desc' => $this->l('Select one or more customer groups to aplly this Fee'),
+                'desc' => $this->l('Select one or more customer groups to compare to the cart values'),
                 'options' => array(
                     'query' => $groups_list,
                     'id' => 'id_option',
@@ -2339,7 +2508,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'label' => $manuf_label,
             'name' => 'CODWFEEPLUS_MANUFACTURERS_ARRAY[]',
             'class' => 'fixed-width-lg',
-            'desc' => $this->l('Select one or more manufacturers to aplly this Fee'),
+            'desc' => $manuf_desc,
             'options' => array(
                 'query' => $manufacturers_list,
                 'id' => 'id_option',
@@ -2375,7 +2544,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'label' => $this->l('Suppliers List'),
             'name' => 'CODWFEEPLUS_SUPPLIERS_ARRAY[]',
             'class' => 'fixed-width-lg',
-            'desc' => $this->l('Select one or more suppliers to aplly this Fee'),
+            'desc' => $this->l('Select one or more suppliers to compare to the cart values'),
             'options' => array(
                 'query' => $suppliers_list,
                 'id' => 'id_option',
@@ -2415,6 +2584,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $helper->submit_action = 'submitCODwFeePlusConditions';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminCODwFeePlus', false);
         $helper->token = Tools::getAdminTokenLite('AdminCODwFeePlus');
+        $helper->override_folder = '_configure/';
         $helper->tpl_vars = array(
             'fields_value' => $fieldValues['form'],
             'languages' => $this->context->controller->getLanguages(),
@@ -2431,6 +2601,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $cond = new CODwFP($in_cond_id);
             $ret['form'] = array(
                 'CODWFEEPLUS_ACTIVE' => $cond->codwfeeplus_active,
+                'CODWFEEPLUS_CONDTYPE' => $cond->codwfeeplus_condtype,
                 'CODWFEEPLUS_ID' => $cond->id_codwfeeplus_cond,
                 'CODWFEEPLUS_FEETYPE' => $cond->codwfeeplus_fee_type,
                 'CODWFEEPLUS_FEE' => $cond->codwfeeplus_fee,
@@ -2460,6 +2631,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         } else {
             $ret['form'] = array(
                 'CODWFEEPLUS_ACTIVE' => Tools::getValue('CODWFEEPLUS_ACTIVE'),
+                'CODWFEEPLUS_CONDTYPE' => Tools::getValue('CODWFEEPLUS_CONDTYPE'),
                 'CODWFEEPLUS_ID' => Tools::getValue('CODWFEEPLUS_ID'),
                 'CODWFEEPLUS_FEETYPE' => Tools::getValue('CODWFEEPLUS_FEETYPE'),
                 'CODWFEEPLUS_FEE' => Tools::getValue('CODWFEEPLUS_FEE'),
@@ -2522,7 +2694,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret &= ($this->_test_result != '');
 
         if ($ret) {
-            $this->_msg[] = $this->l('Successful test. Total fee:') . ' ' . $this->_test_totfee . trim($this->_defCurrencySuffix);
+            if ($this->module->_testoutput_method_active) {
+                $this->_msg[] = $this->l('Successful test. Total fee:') . ' ' . $this->_test_totfee . trim($this->_defCurrencySuffix);
+            } else {
+                $this->_msg[] = $this->l('Successful test. Payment method will be unavailable');
+            }
         } else {
             $this->_errors[] = $this->l('Failed to test.');
         }
@@ -2580,6 +2756,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $cond->codwfeeplus_integration = Tools::getValue('CODWFEEPLUS_INTEGRATION', 0);
         $cond->codwfeeplus_taxrule_id = Tools::getValue('CODWFEEPLUS_TAXRULE', 0);
         $cond->codwfeeplus_active = Tools::getValue('CODWFEEPLUS_ACTIVE', 0);
+        $cond->codwfeeplus_condtype = Tools::getValue('CODWFEEPLUS_CONDTYPE', 0);
         $cond->codwfeeplus_fee = Tools::getValue('CODWFEEPLUS_FEE', 0);
         $cond->codwfeeplus_fee_percent = Tools::getValue('CODWFEEPLUS_PERCENTAGE', 0);
         $cond->codwfeeplus_fee_min = Tools::getValue('CODWFEEPLUS_MIN', 0);

@@ -30,6 +30,7 @@ class CODwFP
     public $codwfeeplus_fee_percent = 0;
     public $codwfeeplus_fee_type = 0;
     public $codwfeeplus_active = 1;
+    public $codwfeeplus_condtype = 0; //0 fee - 1 module activation
     public $codwfeeplus_position;
     public $codwfeeplus_countries = '';
     public $codwfeeplus_zones = '';
@@ -61,6 +62,7 @@ class CODwFP
             'codwfeeplus_fee_percent' => 'float',
             'codwfeeplus_fee_type' => 'int',
             'codwfeeplus_active' => 'int',
+            'codwfeeplus_condtype' => 'int',
             'codwfeeplus_countries' => 'string',
             'codwfeeplus_zones' => 'string',
             'codwfeeplus_carriers' => 'string',
@@ -93,6 +95,7 @@ class CODwFP
                 $this->codwfeeplus_integration = (int) $conds_db[0]['codwfeeplus_integration'];
                 $this->codwfeeplus_taxrule_id = (int) $conds_db[0]['codwfeeplus_taxrule_id'];
                 $this->codwfeeplus_active = (int) $conds_db[0]['codwfeeplus_active'];
+                $this->codwfeeplus_condtype = (int) $conds_db[0]['codwfeeplus_condtype'];
                 $this->codwfeeplus_position = (int) $conds_db[0]['codwfeeplus_position'];
                 $this->codwfeeplus_countries = $conds_db[0]['codwfeeplus_countries'];
                 $this->codwfeeplus_zones = $conds_db[0]['codwfeeplus_zones'];
@@ -125,7 +128,7 @@ class CODwFP
 
     public function saveToDB()
     {
-        $sql1 = 'INSERT INTO `' . _DB_PREFIX_ . 'codwfeeplus_conditions` (`codwfeeplus_active`,`codwfeeplus_fee`,`codwfeeplus_fee_min`,' .
+        $sql1 = 'INSERT INTO `' . _DB_PREFIX_ . 'codwfeeplus_conditions` (`codwfeeplus_active`,`codwfeeplus_condtype`,`codwfeeplus_fee`,`codwfeeplus_fee_min`,' .
                 '`codwfeeplus_fee_max`,`codwfeeplus_fee_percent`,`codwfeeplus_fee_type`,`codwfeeplus_integration`,`codwfeeplus_taxrule_id`,`codwfeeplus_position`,' .
                 '`codwfeeplus_countries`,`codwfeeplus_zones`,`codwfeeplus_manufacturers`,`codwfeeplus_matchall_manufacturers`,' .
                 '`codwfeeplus_suppliers`,`codwfeeplus_matchall_suppliers`,' .
@@ -135,6 +138,7 @@ class CODwFP
                 '`codwfeeplus_fee_percent_include_carrier`,`codwfeeplus_cartvalue_include_carrier`)' .
                 ' VALUES(' .
                 (int) pSQL($this->codwfeeplus_active) . ',' .
+                (int) pSQL($this->codwfeeplus_condtype) . ',' .
                 (float) pSQL($this->codwfeeplus_fee) . ',' .
                 (float) pSQL($this->codwfeeplus_fee_min) . ',' .
                 (float) pSQL($this->codwfeeplus_fee_max) . ',' .
@@ -170,6 +174,7 @@ class CODwFP
                 ',`codwfeeplus_integration`=' . (int) pSQL($this->codwfeeplus_integration) .
                 ',`codwfeeplus_taxrule_id`=' . (int) pSQL($this->codwfeeplus_taxrule_id) .
                 ',`codwfeeplus_active`=' . (int) pSQL($this->codwfeeplus_active) .
+                ',`codwfeeplus_condtype`=' . (int) pSQL($this->codwfeeplus_condtype) .
                 ',`codwfeeplus_position`=' . (int) pSQL($this->codwfeeplus_position) .
                 ',`codwfeeplus_countries`=\'' . pSQL($this->codwfeeplus_countries) . '\'' .
                 ',`codwfeeplus_zones`=\'' . pSQL($this->codwfeeplus_zones) . '\'' .
@@ -370,6 +375,7 @@ class CODwFP
 
     public function getArrayForList($lang_id)
     {
+        $mod = Module::getInstanceByName('codwfeeplus');
         $ret = array(
             'countries' => array(
                 'count' => 0,
@@ -453,14 +459,17 @@ class CODwFP
         }
         //manufacturers
         if ($this->codwfeeplus_manufacturers != '') {
-            $mod = Module::getInstanceByName('codwfeeplus');
             $manufacturers_arr = $this->getManufacturersArray();
             $ret['manufacturers']['count'] = count($manufacturers_arr);
             $i = 0;
             $ret['manufacturers']['matchall'] = $this->codwfeeplus_matchall_manufacturers;
+            $empty_val_text=$mod->l('Empty manufacturer');
+            if ($mod->is17){
+                $empty_val_text=$mod->l('Empty brand');
+            }
             foreach ($manufacturers_arr as $value) {
                 if ($value == '0') {
-                    $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $mod->l('Empty manufacturer');
+                    $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $empty_val_text;
                 } else {
                     $o = new Manufacturer($value);
                     $ret['manufacturers']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
@@ -471,7 +480,6 @@ class CODwFP
         }
         //suppliers
         if ($this->codwfeeplus_suppliers != '') {
-            $mod = Module::getInstanceByName('codwfeeplus');
             $suppliers_arr = $this->getSuppliersArray();
             $ret['suppliers']['count'] = count($suppliers_arr);
             $i = 0;
@@ -526,6 +534,7 @@ class CODwFP
             'codwfeeplus_fee_percent' => $this->codwfeeplus_fee_percent,
             'codwfeeplus_fee_type' => $this->codwfeeplus_fee_type,
             'codwfeeplus_active' => $this->codwfeeplus_active,
+            'codwfeeplus_condtype' => $this->codwfeeplus_condtype,
             'codwfeeplus_countries' => $this->codwfeeplus_countries,
             'codwfeeplus_zones' => $this->codwfeeplus_zones,
             'codwfeeplus_carriers' => $this->codwfeeplus_carriers,
