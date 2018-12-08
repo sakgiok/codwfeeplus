@@ -2042,7 +2042,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $manuf_matchall_hint = $this->l('Toggle whether to match all the brands of the cart, to the brands selected in a condition. If disabled, even if only one brand matches the condition brands, this step of validation will be passed.');
         }
 
-        $manufacturers = ManufacturerCore::getManufacturers();
+        $manufacturers = Manufacturer::getManufacturers();
         $manufacturers_list = array(
             0 => array(
                 'id_option' => 0,
@@ -2056,7 +2056,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
-        $suppliers = SupplierCore::getSuppliers();
+        $suppliers = Supplier::getSuppliers();
         $suppliers_list = array(
             0 => array(
                 'id_option' => 0,
@@ -2227,7 +2227,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                             'id' => 'id_option',
                             'name' => 'name',
                         ),
-                        'hint' => $this->l('If the condition is validated, and a COD product is used, what is the tax that it should contain?'),
+                        'hint' => $this->l('If the condition is validated, and a COD product is used, what is the tax that it should contain? This only applies when the COD product is used. If fee is added to the carrier, the selected carrier\'s tax will be used.'),
                     ),
                     array(
                         'type' => 'html',
@@ -2350,9 +2350,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     array(
                         'type' => 'select',
                         'multiple' => true,
+                        'add_buttons' => true,
                         'label' => $this->l('Carriers List'),
                         'name' => 'CODWFEEPLUS_DELIVERY_ARRAY[]',
-                        'class' => 'fixed-width-lg',
+                        'class' => 'codwfeeplus_admin_select',
                         'desc' => $this->l('Select one or more carriers to compare to the cart values'),
                         'options' => array(
                             'query' => $carriers_list,
@@ -2371,9 +2372,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     array(
                         'type' => 'select',
                         'multiple' => true,
+                        'add_buttons' => true,
                         'label' => $this->l('Countries List'),
                         'name' => 'CODWFEEPLUS_COUNTRIES_ARRAY[]',
-                        'class' => 'fixed-width-lg',
+                        'class' => 'codwfeeplus_admin_select',
                         'desc' => $this->l('Select one or more countries to compare to the cart values'),
                         'options' => array(
                             'query' => $country_list,
@@ -2392,9 +2394,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     array(
                         'type' => 'select',
                         'multiple' => true,
+                        'add_buttons' => true,
                         'label' => $this->l('Zone List'),
                         'name' => 'CODWFEEPLUS_ZONES_ARRAY[]',
-                        'class' => 'fixed-width-lg',
+                        'class' => 'codwfeeplus_admin_select',
                         'desc' => $this->l('Select one or more zones to compare to the cart values'),
                         'options' => array(
                             'query' => $zones_list,
@@ -2421,9 +2424,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $fields_form['form']['input'][] = array(
                 'type' => 'select',
                 'multiple' => true,
+                'add_buttons' => true,
                 'label' => $this->l('Groups List'),
                 'name' => 'CODWFEEPLUS_GROUPS_ARRAY[]',
-                'class' => 'fixed-width-lg',
+                'class' => 'codwfeeplus_admin_select',
                 'desc' => $this->l('Select one or more customer groups to compare to the cart values'),
                 'options' => array(
                     'query' => $groups_list,
@@ -2505,9 +2509,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $fields_form['form']['input'][] = array(
             'type' => 'select',
             'multiple' => true,
+            'add_buttons' => true,
             'label' => $manuf_label,
             'name' => 'CODWFEEPLUS_MANUFACTURERS_ARRAY[]',
-            'class' => 'fixed-width-lg',
+            'class' => 'codwfeeplus_admin_select',
             'desc' => $manuf_desc,
             'options' => array(
                 'query' => $manufacturers_list,
@@ -2541,9 +2546,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $fields_form['form']['input'][] = array(
             'type' => 'select',
             'multiple' => true,
+            'add_buttons' => true,
             'label' => $this->l('Suppliers List'),
             'name' => 'CODWFEEPLUS_SUPPLIERS_ARRAY[]',
-            'class' => 'fixed-width-lg',
+            'class' => 'codwfeeplus_admin_select',
             'desc' => $this->l('Select one or more suppliers to compare to the cart values'),
             'options' => array(
                 'query' => $suppliers_list,

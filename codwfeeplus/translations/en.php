@@ -3,6 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{codwfeeplus}prestashop>codwfp_2bf46c6abe54cd3659b86fa1a65ea576'] = 'Empty manufacturer';
+$_MODULE['<{codwfeeplus}prestashop>codwfp_a69804b4bd8802574122acc9518420b1'] = 'Empty brand';
 $_MODULE['<{codwfeeplus}prestashop>codwfp_3cf7a1c6ba56006a7ccda476bcd4f4e4'] = 'Empty supplier';
 $_MODULE['<{codwfeeplus}prestashop>codwfeeplus_f4f731d6da764426b0255cede1f55375'] = 'Cash on delivery with fee (COD) PLUS';
 $_MODULE['<{codwfeeplus}prestashop>codwfeeplus_042eb1587500b095241b72ba725f4cea'] = 'Accept cash on delivery payments with extra fee and more options';
@@ -155,7 +156,7 @@ $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_1d3e8a7b9d5029b03e
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_61b3587948add22fd8c68eaad881b121'] = 'Integration';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_adf1fb6f33559d78a8f277e22c34d1f7'] = 'If the condition is validated, how the fee will be integrated to the order?';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_451aaec2d59adccc21d5bd99caa3ff2f'] = 'COD Product tax rule';
-$_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_048f61e72a3716bdea4fbeb59d9c27ab'] = 'If the condition is validated, and a COD product is used, what is the tax that it should contain?';
+$_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_6002cb681f9ac0215eb6637a341e2c6e'] = 'If the condition is validated, and a COD product is used, what is the tax that it should contain? This only applies when the COD product is used. If fee is added to the carrier, the selected carrier\'s tax will be used.';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_f591929add9a644afd0e8ea945dc65a0'] = 'Fee Type';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_e25d2dc890529559290e9c55112c086f'] = 'If the condition is validated, what kind of fee should be applied?';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_50a4e633bec0aa973913215c4a580534'] = 'This amount will be added to fee if fixed or percentage + fixed fee method is selected.';
@@ -215,6 +216,8 @@ $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_2d4c6d5cd4bc7690ba
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_a457034b0e47194e0c9904bb5206359c'] = 'The module is not active. Please activate it.';
 $_MODULE['<{codwfeeplus}prestashop>ajax_b6f0f1fc3358d7ab19a49021689bf2b8'] = 'Cash on delivery fee';
 $_MODULE['<{codwfeeplus}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'This payment method is not available.';
+$_MODULE['<{codwfeeplus}prestashop>form_45e96c0a422ce8a1a6ec1bd5eb9625c6'] = 'Select All';
+$_MODULE['<{codwfeeplus}prestashop>form_cc2c4680ce4d30b12ba6c0d41dc1b054'] = 'Select None';
 $_MODULE['<{codwfeeplus}prestashop>list_content_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Enabled';
 $_MODULE['<{codwfeeplus}prestashop>list_content_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabled';
 $_MODULE['<{codwfeeplus}prestashop>list_content_0bcef9c45bd8a48eda1b26eb0c61c869'] = '%';

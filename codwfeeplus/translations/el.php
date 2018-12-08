@@ -3,6 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{codwfeeplus}prestashop>codwfp_2bf46c6abe54cd3659b86fa1a65ea576'] = 'Κενός κατασκευαστής';
+$_MODULE['<{codwfeeplus}prestashop>codwfp_a69804b4bd8802574122acc9518420b1'] = 'Κενή μάρκα';
 $_MODULE['<{codwfeeplus}prestashop>codwfp_3cf7a1c6ba56006a7ccda476bcd4f4e4'] = 'Κενός προμηθευτής';
 $_MODULE['<{codwfeeplus}prestashop>codwfeeplus_f4f731d6da764426b0255cede1f55375'] = 'Αντικαταβολή με χρέωση (COD) PLUS';
 $_MODULE['<{codwfeeplus}prestashop>codwfeeplus_042eb1587500b095241b72ba725f4cea'] = 'Αποδεχθείτε πληρωμές με μετρητά με επιπλέον χρέωση και περισσότερες επιλογές';
@@ -155,7 +156,7 @@ $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_1d3e8a7b9d5029b03e
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_61b3587948add22fd8c68eaad881b121'] = 'Ενσωμάτωση';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_adf1fb6f33559d78a8f277e22c34d1f7'] = 'Εάν η συνθήκη επικυρωθεί, πως θα ενσωματωθεί η χρέωση στη παραγγελία;';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_451aaec2d59adccc21d5bd99caa3ff2f'] = 'Κανόνας φορολόγησης του προϊόντος αντικαταβολής';
-$_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_048f61e72a3716bdea4fbeb59d9c27ab'] = 'Εάν η συνθήκη επικυρωθεί και έχει επιλεγεί να χρησιμοποιηθεί ένα προϊόν αντικαταβολής, τι είδους φόρο θα περιέχει;';
+$_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_6002cb681f9ac0215eb6637a341e2c6e'] = 'Εάν η συνθήκη επικυρωθεί και έχει επιλεγεί να χρησιμοποιηθεί ένα προϊόν αντικαταβολής, τι είδους φόρο θα περιέχει; Αυτός ο φόρος ισχύει μόνο εάν επιλεγεί να χρησιμοποιηθεί το προϊόν αντικαταβολής. Εάν η χρέωση ενσωματωθεί στο μεταφορέα, θα χρησιμοποιηθεί ο φόρος του επιλεγμένου μεταφορέα.';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_f591929add9a644afd0e8ea945dc65a0'] = 'Τύπος χρέωσης';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_e25d2dc890529559290e9c55112c086f'] = 'Εάν η συνθήκη επικυρωθεί, τι είδους χρέωση θα εφαρμοστεί;';
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_50a4e633bec0aa973913215c4a580534'] = 'Το ποσό αυτό θα προστεθεί στη χρέωση εάν έχει επιλεγεί μέθοδος σταθερής ή ποσοστού + σταθερής χρέωσης.';
@@ -215,6 +216,8 @@ $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_2d4c6d5cd4bc7690ba
 $_MODULE['<{codwfeeplus}prestashop>admincodwfeepluscontroller_a457034b0e47194e0c9904bb5206359c'] = 'Το πρόσθετο δεν είναι ενεργοποιημένο. Παρακαλώ ενεργοποιήστε το.';
 $_MODULE['<{codwfeeplus}prestashop>ajax_b6f0f1fc3358d7ab19a49021689bf2b8'] = 'Χρέωση αντικαταβολής';
 $_MODULE['<{codwfeeplus}prestashop>validation_e2b7dec8fa4b498156dfee6e4c84b156'] = 'Αυτή η μέθοδος πληρωμής δεν είναι διαθέσιμη.';
+$_MODULE['<{codwfeeplus}prestashop>form_45e96c0a422ce8a1a6ec1bd5eb9625c6'] = 'Επιλογή Όλων';
+$_MODULE['<{codwfeeplus}prestashop>form_cc2c4680ce4d30b12ba6c0d41dc1b054'] = 'Αποεπιλογή Όλων';
 $_MODULE['<{codwfeeplus}prestashop>list_content_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Ενεργοποιημένο';
 $_MODULE['<{codwfeeplus}prestashop>list_content_b9f5c797ebbf55adccdd8539a65a0241'] = 'Απενεργοποιημένο';
 $_MODULE['<{codwfeeplus}prestashop>list_content_0bcef9c45bd8a48eda1b26eb0c61c869'] = '%';

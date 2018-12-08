@@ -36,7 +36,7 @@ class codwfeeplus extends PaymentModule
     public $_testoutput_check = '';
     public $_testoutput_applyfee = '';
     public $_testoutput_method_active = true;
-    public $_cond_integration = '';
+    public $_cond_integration = 0;
     public $_cond_taxrule = 0;
     public $_updatestatus = array(
         'res' => '',
@@ -61,7 +61,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -1074,6 +1074,36 @@ class codwfeeplus extends PaymentModule
         return Tools::ps_round((float) $ret, _PS_PRICE_COMPUTE_PRECISION_);
     }
 
+    /**
+     * Gets the final tax once a carrier and address exists
+     *
+     * @param int $carrier_id
+     * @param int $address_id
+     * @return float
+     */
+    public function getCODFeeTax($carrier_id, $address_id)
+    {
+        $car = new Carrier($carrier_id);
+        $address = Address::initialize((int) $address_id);
+        $carrier_tax = ((float) $car->getTaxesRate($address)) * 0.01;
+        $product_tax = 0;
+        $CODfee_tax = 0;
+        if ($this->_cond_taxrule != 0) {
+            $p = new Product();
+            $p->id_tax_rules_group = $this->_cond_taxrule;
+            $product_tax = ((float) $p->getTaxesRate()) * 0.01;
+            unset($p);
+        }
+
+        if ($this->_cond_integration == 0) {
+            $CODfee_tax = $carrier_tax;
+        } else {
+            $CODfee_tax = $product_tax;
+        }
+
+        return $CODfee_tax;
+    }
+
     private function checkCondValid($cond, $id_carrier, $id_country, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop)
     {
         $this->_testoutput_check = '<div class="codwfeeplus_cond_check_steps"><ul>';
@@ -1737,6 +1767,9 @@ class codwfeeplus extends PaymentModule
                     $order->total_discounts_tax_incl = (float) abs($this->context->cart->getOrderTotal(true, Cart::ONLY_DISCOUNTS, $order->product_list, $id_carrier));
                     $order->total_discounts = $order->total_discounts_tax_incl;
 
+                    if (!is_null($carrier) && Validate::isLoadedObject($carrier)) {
+                        $order->carrier_tax_rate = $carrier->getTaxesRate(new Address((int) $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
+                    }
 //Adding cod fee
                     $feewithout = $fee;
 
@@ -1748,9 +1781,7 @@ class codwfeeplus extends PaymentModule
                     $order->total_shipping_tax_excl = (float) $this->context->cart->getPackageShippingCost((int) $id_carrier, false, null, $order->product_list) + $feewithout;
                     $order->total_shipping_tax_incl = (float) $this->context->cart->getPackageShippingCost((int) $id_carrier, true, null, $order->product_list) + $fee;
                     $order->total_shipping = $order->total_shipping_tax_incl;
-                    if (!is_null($carrier) && Validate::isLoadedObject($carrier)) {
-                        $order->carrier_tax_rate = $carrier->getTaxesRate(new Address((int) $this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}));
-                    }
+
                     $order->total_wrapping_tax_excl = (float) abs($this->context->cart->getOrderTotal(false, Cart::ONLY_WRAPPING, $order->product_list, $id_carrier));
                     $order->total_wrapping_tax_incl = (float) abs($this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING, $order->product_list, $id_carrier));
                     $order->total_wrapping = $order->total_wrapping_tax_incl;

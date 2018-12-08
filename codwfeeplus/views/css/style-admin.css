@@ -374,3 +374,16 @@ p.codwfeeplus_nogroup_error{
 .bootstrap .table tbody>tr.codwfeeplus_condlist_type_paymethod:hover>td {
     background-color: #f1e775;
 }
+select.codwfeeplus_admin_select {
+    display: inline-block
+}
+.codwfeeplus_btn_container{
+    vertical-align: top;
+    display: inline-block;
+}
+.codwfeeplus_btn_selectall{
+    
+}
+.codwfeeplus_btn_selectnone{
+    
+}

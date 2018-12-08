@@ -22,6 +22,11 @@
 
 $(document).ready(function () {
 
+    function jqSelector(str)
+    {
+        return str.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
+    }
+
     function codwfeeplus_prod_details_hide() {
         $('div.codwfeeplus_product_details input').css('background-color', '#ffebeb');
     }
@@ -182,6 +187,15 @@ $(document).ready(function () {
         }
         $("body").append('<form action="' + url + '" method="post" id="codwfeeplus_poster">' + inputs + '</form>');
         $("#codwfeeplus_poster").submit();
+    });
+
+    $(".codwfeeplus_btn_selectall").click(function (e) {
+        var id = $(this).data("rel");
+        $("#" + jqSelector(id)+" option").prop('selected', true);
+    });
+    $(".codwfeeplus_btn_selectnone").click(function (e) {
+        var id = $(this).data("rel");
+        $("#" + jqSelector(id)+" option").prop('selected', false);
     });
 });
 

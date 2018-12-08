@@ -40,19 +40,22 @@ class CODwFeePlusAjaxModuleFrontController extends ModuleFrontController
                 );
 
                 if ($cod_active) {
+                    $cart_obj = $this->context->cart;
+                    $address_id = $cart_obj->getTaxAddressId();
                     $CODfee = $this->module->getCostFromCart($this->context->cart);
-                    $CODfee_notax = $CODfee;
+
+                    $CODfee_tax = $this->module->getCODFeeTax($cart_obj->id_carrier, $address_id);
+
+                    $CODfee_notax = Tools::ps_round(((float) $CODfee) / (1.0 + $CODfee_tax), 9);
+                    $CODfee_tax_amount = Tools::ps_round(((float) $CODfee_notax) * $CODfee_tax, 9);
                     $total_cart = $this->context->cart->getOrderTotal(true, Cart::BOTH);
                     $total_cart_notax = $this->context->cart->getOrderTotal(false, Cart::BOTH);
-                    $taxrule = $this->module->_cond_taxrule;
-                    if ($taxrule != 0) {
-                        $p = new Product();
-                        $p->id_tax_rules_group = $taxrule;
-                        $tax = ((float) $p->getTaxesRate()) * 0.01;
-                        $CODfee_notax = Tools::ps_round((float) $CODfee / (1.0 + $tax), 9);
-                        unset($p);
-                    }
 
+                    if (isset($cart['subtotals']['tax'])) {
+                        $total_taxes = $total_cart - $total_cart_notax;
+                        $cart['subtotals']['tax']['amount'] = $total_taxes + $CODfee_tax_amount;
+                        $cart['subtotals']['tax']['value'] = Tools::displayPrice($total_taxes + $CODfee_tax_amount);
+                    }
                     $cart['subtotals']['cod'] = array(
                         'amount' => $CODfee,
                         'label' => $this->module->l('Cash on delivery fee', 'ajax'),

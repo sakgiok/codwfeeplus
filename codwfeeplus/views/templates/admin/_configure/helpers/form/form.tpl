@@ -400,6 +400,16 @@
 												{/foreach}
 											{/if}
 										</select>
+                                                                                {if isset($input.add_buttons) && $input.add_buttons}
+                                                                                    <div class="codwfeeplus_btn_container">
+                                                                                        <div class="codwfeeplus_btn_selectall btn btn-success" data-rel="{if isset($input.id)}{$input.id|escape:'html':'utf-8'}{else}{$input.name|escape:'html':'utf-8'}{/if}">
+                                                                                            {l s='Select All' mod='codwfeeplus'}
+                                                                                        </div>
+                                                                                        <div class="codwfeeplus_btn_selectnone btn btn-warning" data-rel="{if isset($input.id)}{$input.id|escape:'html':'utf-8'}{else}{$input.name|escape:'html':'utf-8'}{/if}">
+                                                                                            {l s='Select None' mod='codwfeeplus'}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                {/if}
 									{/if}
 								{elseif $input.type == 'radio'}
 									{foreach $input.values as $value}

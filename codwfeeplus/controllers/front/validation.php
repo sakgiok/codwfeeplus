@@ -106,10 +106,14 @@ class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
         if (!$this->module->is17) {
             parent::initContent();
             $CODfee = $this->module->getCostFromCart($this->context->cart);
-            
+            $CODfee_tax_percent = $this->module->getCODFeeTax($this->context->cart->id_carrier, $this->context->cart->id_address_delivery);
+            $CODfee_notax = Tools::ps_round(((float) $CODfee) / (1.0 + $CODfee_tax_percent), 9);
+            $CODfee_tax_amount = Tools::ps_round(((float) $CODfee_notax) * $CODfee_tax_percent, 9);
             $this->context->smarty->assign(array(
                 'total' => ($this->context->cart->getOrderTotal(true, Cart::BOTH) + $CODfee),
                 'codfee' => $CODfee,
+                'codfee_tax_amount' => $CODfee_tax_amount,
+                'codfee_notax' => $CODfee_notax,
                 'product_value' => ($this->context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS)),
                 'carrierfee' => $this->context->cart->getOrderTotal(true, Cart::ONLY_SHIPPING),
                 'wrappingfee' => $this->context->cart->getOrderTotal(true, Cart::ONLY_WRAPPING),
