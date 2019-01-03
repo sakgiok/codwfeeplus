@@ -39,6 +39,7 @@ class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
         $testoutput = $this->module->_testoutput;
         $cond_integration = $this->module->_cond_integration;
         $taxrule = $this->module->_cond_taxrule;
+        $orderstate = $this->module->_cond_orderstate;
 
         if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
             Tools::redirect('index.php?controller=order&step=1');
@@ -66,21 +67,21 @@ class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
         if ($integration == 0) {
             //By condition
             if ($cond_integration == 1 && $CODfee != 0) {
-                $this->validate_addProduct($CODfee, $cart, $customer, $taxrule);
+                $this->validate_addProduct($CODfee, $cart, $customer, $taxrule, $orderstate);
             } else {
-                $this->validate_addToCarrier($CODfee, $cart, $customer);
+                $this->validate_addToCarrier($CODfee, $cart, $customer, $orderstate);
             }
         } elseif ($integration == 2 && $CODfee != 0) {
-            $this->validate_addProduct($CODfee, $cart, $customer, $taxrule);
+            $this->validate_addProduct($CODfee, $cart, $customer, $taxrule, $orderstate);
         } else {
-            $this->validate_addToCarrier($CODfee, $cart, $customer);
+            $this->validate_addToCarrier($CODfee, $cart, $customer, $orderstate);
         }
 
         $this->module->addTransaction($customer->id, (int) $this->module->currentOrder, $CODfee, $total_original, $testoutput);
         Tools::redirect('index.php?controller=order-confirmation&id_cart=' . $cart->id . '&id_module=' . $this->module->id . '&id_order=' . $this->module->currentOrder . '&key=' . $customer->secure_key);
     }
 
-    private function validate_addProduct($CODfee, $cart, $customer, $taxrule)
+    private function validate_addProduct($CODfee, $cart, $customer, $taxrule, $orderstate)
     {
         $currency = $this->context->currency;
         $this->module->updateCODProduct((float) $CODfee, $taxrule);
@@ -88,14 +89,18 @@ class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
         $this->module->addCODProductToCart($cart);
         $total = $cart->getOrderTotal(true, Cart::BOTH);
         $package_list = $cart->getPackageList(true); //Flush the cache
-        $this->module->validateOrder((int) $cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
+        $this->module->validateOrder((int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
     }
 
-    private function validate_addToCarrier($CODfee, $cart, $customer)
+    private function validate_addToCarrier($CODfee, $cart, $customer, $orderstate)
     {
         $currency = $this->context->currency;
         $total = ($cart->getOrderTotal(true, Cart::BOTH) + $CODfee);
-        $this->module->validateOrder_AddToCarrier($CODfee, (int) $cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
+        if ($this->module->is17) {
+            $this->module->validateOrder_AddToCarrier_17($CODfee, (int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
+        } else {
+            $this->module->validateOrder_AddToCarrier_16($CODfee, (int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
+        }
     }
 
     /**

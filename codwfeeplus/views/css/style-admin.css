@@ -305,17 +305,23 @@ hr.codwfeeplus_form_hr{
     text-decoration: none;
     color: #3586AE;
     background-color: #edf7fb;
-    border: none;
-    border-bottom: solid 1px #D8EDF7;
+    border: inset 1px #22b1f7;
     padding: 0 5px;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    -webkit-box-shadow: #a3c0ca -2px 2px 4px 0px;
-    box-shadow: -2px 2px 4px 0px #a3c0ca;
 }
 .codwfeeplus_conditions tbody td.codwfeeplus_nowrap{
     white-space: nowrap;
+}
+
+.codwfeeplus_condlist_orderstate{
+    padding: 5px;
+    display: inline-block;
+}
+.codwfeeplus_condlist_orderstate_header{
+    padding: 5px;
+    display: block;
 }
 
 p.codwfeeplus_nogroup_error{
@@ -355,15 +361,19 @@ p.codwfeeplus_nogroup_error{
     line-height: 2em;
 }
 
-.codwfeeplus_list_cell_hidden{
+.bootstrap td.codwfeeplus_list_cell_hidden, .bootstrap th.codwfeeplus_list_cell_hidden {
     display: none;
 }
 .codwfeeplus_list_notavail i {
     color: #b77025;
     text-shadow: -2px 3px 4px #bbb785;
 }
+.bootstrap #table-codwfeeplus_cond thead>tr>th{
+    border-bottom: 1px solid #a0d0eb;
+}
 .bootstrap .table tbody>tr.codwfeeplus_condlist_type_fee>td {
     background-color: #deeefd;
+    border-bottom: 1px solid #a0d0eb;
 }
 .bootstrap .table tbody>tr.codwfeeplus_condlist_type_fee:hover>td {
     background-color: #c9e1f7;
@@ -382,8 +392,60 @@ select.codwfeeplus_admin_select {
     display: inline-block;
 }
 .codwfeeplus_btn_selectall{
-    
+
 }
 .codwfeeplus_btn_selectnone{
-    
+
+}
+.codwfeeplus_sublist_row {
+    display: block;
+    width: 100%;
+    margin: 3px 0;
+    background-color: #bad9f7;
+}
+.codwfeeplus_condlist_type_paymethod .codwfeeplus_sublist_row {
+    background-color: #e8e1a5;
+}
+.codwfeeplus_sublist_title{
+    display: inline-block;
+    width: 40%;
+    font-weight: bold;
+    font-style: italic;
+    text-align: right;
+}
+.codwfeeplus_sublist_value{
+    display: inline-block;
+    width: 50%;
+    text-align: left;
+}
+.codwfeeplus_sublist_divider{
+    width: 10%;
+    display: inline-block;
+}
+.codwfeeplus_col_id{
+    width: 5%;
+}
+.codwfeeplus_col_desc{
+    width: 10%;
+}
+.codwfeeplus_col_integration{
+    width: 5%;
+}
+.codwfeeplus_col_tax{
+    width: 5%;
+}
+.codwfeeplus_col_orderstate{
+    width: 10%;
+}
+.codwfeeplus_col_templates{
+    width: 20%;
+}
+.codwfeeplus_col_feecalc{
+    width: 20%;
+}
+.codwfeeplus_col_cond{
+    width: 15%;
+}
+.codwfeeplus_col_active{
+    width: 5%;
 }

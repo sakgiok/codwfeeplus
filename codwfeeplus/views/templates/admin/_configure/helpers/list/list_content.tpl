@@ -125,7 +125,9 @@
 						{/if}
 					{elseif isset($params.maxlength) && Tools::strlen($tr.$key) > $params.maxlength}
 						<span title="{$tr.$key|escape:'html':'UTF-8'}">{$tr.$key|truncate:$params.maxlength:'...'|escape:'html':'UTF-8'}</span>
-					{else}
+					{elseif isset($params.html)}
+                                            {$tr.$key}
+                                        {else}
 						{$tr.$key|escape:'html':'UTF-8'}
 					{/if}
 				{else}

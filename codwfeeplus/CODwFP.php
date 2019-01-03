@@ -44,6 +44,7 @@ class CODwFP
     public $codwfeeplus_cartvalue_sign = 0;
     public $codwfeeplus_cartvalue = 0;
     public $codwfeeplus_integration = 0;
+    public $codwfeeplus_orderstate_id = 0;
     public $codwfeeplus_taxrule_id = 0;
     public $codwfeeplus_fee_percent_include_carrier = 0;
     public $codwfeeplus_cartvalue_include_carrier = 0;
@@ -74,6 +75,7 @@ class CODwFP
             'codwfeeplus_cartvalue_sign' => 'int',
             'codwfeeplus_cartvalue' => 'float',
             'codwfeeplus_integration' => 'int',
+            'codwfeeplus_orderstate_id' => 'int',
             'codwfeeplus_taxrule_id' => 'int',
             'codwfeeplus_fee_percent_include_carrier' => 'int',
             'codwfeeplus_cartvalue_include_carrier' => 'int',
@@ -93,6 +95,7 @@ class CODwFP
                 $this->codwfeeplus_fee_percent = (float) $conds_db[0]['codwfeeplus_fee_percent'];
                 $this->codwfeeplus_fee_type = (int) $conds_db[0]['codwfeeplus_fee_type'];
                 $this->codwfeeplus_integration = (int) $conds_db[0]['codwfeeplus_integration'];
+                $this->codwfeeplus_orderstate_id = (int) $conds_db[0]['codwfeeplus_orderstate_id'];
                 $this->codwfeeplus_taxrule_id = (int) $conds_db[0]['codwfeeplus_taxrule_id'];
                 $this->codwfeeplus_active = (int) $conds_db[0]['codwfeeplus_active'];
                 $this->codwfeeplus_condtype = (int) $conds_db[0]['codwfeeplus_condtype'];
@@ -129,7 +132,8 @@ class CODwFP
     public function saveToDB()
     {
         $sql1 = 'INSERT INTO `' . _DB_PREFIX_ . 'codwfeeplus_conditions` (`codwfeeplus_active`,`codwfeeplus_condtype`,`codwfeeplus_fee`,`codwfeeplus_fee_min`,' .
-                '`codwfeeplus_fee_max`,`codwfeeplus_fee_percent`,`codwfeeplus_fee_type`,`codwfeeplus_integration`,`codwfeeplus_taxrule_id`,`codwfeeplus_position`,' .
+                '`codwfeeplus_fee_max`,`codwfeeplus_fee_percent`,`codwfeeplus_fee_type`,`codwfeeplus_integration`,`codwfeeplus_taxrule_id`,'
+                . '`codwfeeplus_orderstate_id`,`codwfeeplus_position`,' .
                 '`codwfeeplus_countries`,`codwfeeplus_zones`,`codwfeeplus_manufacturers`,`codwfeeplus_matchall_manufacturers`,' .
                 '`codwfeeplus_suppliers`,`codwfeeplus_matchall_suppliers`,' .
                 '`codwfeeplus_carriers`,`codwfeeplus_categories`,`codwfeeplus_matchall_categories`,' .
@@ -146,6 +150,7 @@ class CODwFP
                 (int) pSQL($this->codwfeeplus_fee_type) . ',' .
                 (int) pSQL($this->codwfeeplus_integration) . ',' .
                 (int) pSQL($this->codwfeeplus_taxrule_id) . ',' .
+                (int) pSQL($this->codwfeeplus_orderstate_id) . ',' .
                 (int) pSQL($this->codwfeeplus_position) . ',' .
                 '\'' . pSQL($this->codwfeeplus_countries) . '\',' .
                 '\'' . pSQL($this->codwfeeplus_zones) . '\',' .
@@ -173,6 +178,7 @@ class CODwFP
                 ',`codwfeeplus_fee_type`=' . (int) pSQL($this->codwfeeplus_fee_type) .
                 ',`codwfeeplus_integration`=' . (int) pSQL($this->codwfeeplus_integration) .
                 ',`codwfeeplus_taxrule_id`=' . (int) pSQL($this->codwfeeplus_taxrule_id) .
+                ',`codwfeeplus_orderstate_id`=' . (int) pSQL($this->codwfeeplus_orderstate_id) .
                 ',`codwfeeplus_active`=' . (int) pSQL($this->codwfeeplus_active) .
                 ',`codwfeeplus_condtype`=' . (int) pSQL($this->codwfeeplus_condtype) .
                 ',`codwfeeplus_position`=' . (int) pSQL($this->codwfeeplus_position) .
@@ -463,9 +469,9 @@ class CODwFP
             $ret['manufacturers']['count'] = count($manufacturers_arr);
             $i = 0;
             $ret['manufacturers']['matchall'] = $this->codwfeeplus_matchall_manufacturers;
-            $empty_val_text=$mod->l('Empty manufacturer');
-            if ($mod->is17){
-                $empty_val_text=$mod->l('Empty brand');
+            $empty_val_text = $mod->l('Empty manufacturer');
+            if ($mod->is17) {
+                $empty_val_text = $mod->l('Empty brand');
             }
             foreach ($manufacturers_arr as $value) {
                 if ($value == '0') {
@@ -525,6 +531,132 @@ class CODwFP
         return $ret;
     }
 
+    public function validateConditionValues()
+    {
+        $lang_id = (int) Configuration::get('PS_LANG_DEFAULT');
+        $changed = false;
+        if ($this->codwfeeplus_taxrule_id != 0) {
+            $tax_array_raw = TaxRulesGroup::getTaxRulesGroups();
+            if (array_search($this->codwfeeplus_taxrule_id, array_column($tax_array_raw, 'id_tax_rules_group')) === false) {
+                $this->codwfeeplus_taxrule_id = 0;
+                $changed = true;
+            }
+        }
+
+        if ($this->codwfeeplus_orderstate_id != 0) {
+            $os = OrderState::getOrderStates($lang_id);
+            if (array_search($this->codwfeeplus_orderstate_id, array_column($os, 'id_order_state')) === false) {
+                $this->codwfeeplus_orderstate_id = 0;
+                $changed = true;
+            }
+        }
+
+        if ($this->codwfeeplus_countries != '') {
+            $countries = null;
+            if (Configuration::get('PS_RESTRICT_DELIVERED_COUNTRIES')) {
+                $countries = Carrier::getDeliveredCountries($lang_id, true, true);
+            } else {
+                $countries = Country::getCountries($lang_id, true);
+            }
+            $countries_arr = $this->getCountriesArray();
+            $new_arr = array();
+            foreach ($countries_arr as $value) {
+                if (array_search($value, array_column($countries, 'id_country')) === false) {
+                    $changed = true;
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_countries = $this->arrayToString($new_arr);
+        }
+
+        if ($this->codwfeeplus_zones != '') {
+            $zones = Zone::getZones();
+            $zones_arr = $this->getZonesArray();
+            $new_arr = array();
+            foreach ($zones_arr as $value) {
+                if (array_search($value, array_column($zones, 'id_zone')) === false) {
+                    $changed = true;
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_zones = $this->arrayToString($new_arr);
+        }
+
+        if (Group::isFeatureActive()) {
+            if ($this->codwfeeplus_groups != '') {
+                $groups = Group::getGroups($lang_id);
+                $groups_arr = $this->getGroupsArray();
+                $new_arr = array();
+                foreach ($groups_arr as $value) {
+                    if (array_search($value, array_column($groups, 'id_group')) === false) {
+                        $changed = true;
+                    } else {
+                        $new_arr[] = $value;
+                    }
+                }
+                $this->codwfeeplus_groups = $this->arrayToString($new_arr);
+            }
+        }
+
+        if ($this->codwfeeplus_categories != '') {
+            $categories = Category::getCategories(false, true, false);
+            $categories_arr = $this->getCategoriesArray();
+            $new_arr = array();
+            foreach ($categories_arr as $value) {
+                if (array_search($value, array_column($categories, 'id_category')) === false) {
+                    $changed = true;
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_categories = $this->arrayToString($new_arr);
+        }
+
+        if ($this->codwfeeplus_manufacturers != '') {
+            $manufacturers = Manufacturer::getManufacturers();
+            $manufacturers_arr = $this->getManufacturersArray();
+            $new_arr = array();
+            foreach ($manufacturers_arr as $value) {
+                if ($value != 0) {
+                    if (array_search($value, array_column($manufacturers, 'id_manufacturer')) === false) {
+                        $changed = true;
+                    } else {
+                        $new_arr[] = $value;
+                    }
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_manufacturers = $this->arrayToString($new_arr);
+        }
+
+        if ($this->codwfeeplus_suppliers != '') {
+            $suppliers = Supplier::getSuppliers();
+            $suppliers_arr = $this->getSuppliersArray();
+            $new_arr = array();
+            foreach ($suppliers_arr as $value) {
+                if ($value != 0) {
+                    if (array_search($value, array_column($suppliers, 'id_supplier')) === false) {
+                        $changed = true;
+                    } else {
+                        $new_arr[] = $value;
+                    }
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_suppliers = $this->arrayToString($new_arr);
+        }
+
+        if ($changed) {
+            $this->saveToDB();
+        }
+
+        return !$changed;
+    }
+
     public function exportConditionArray()
     {
         $out = array(
@@ -551,6 +683,7 @@ class CODwFP
             'codwfeeplus_cartvalue' => $this->codwfeeplus_cartvalue,
             'codwfeeplus_integration' => $this->codwfeeplus_integration,
             'codwfeeplus_taxrule_id' => $this->codwfeeplus_taxrule_id,
+            'codwfeeplus_orderstate_id' => $this->codwfeeplus_orderstate_id,
             'codwfeeplus_fee_percent_include_carrier' => $this->codwfeeplus_fee_percent_include_carrier,
             'codwfeeplus_cartvalue_include_carrier' => $this->codwfeeplus_cartvalue_include_carrier
         );

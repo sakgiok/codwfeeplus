@@ -1,3 +1,8 @@
+## v1.1.2
+* Added option for order state after payment.
+* Added some sanity checks for some parameters that might change in Prestashop from the user (tax rules, custom order states, countries , zones etc).
+* Fixed a bug with ValidateOrder function.
+* Visual improvements.
 ## v1.1.1
 * Taxes are now displaying correctly in PS1.7 cart summary and in PS 1.6-1.7 invoice.
 * Added buttons in condition parameter editing.
