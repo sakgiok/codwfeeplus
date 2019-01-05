@@ -62,7 +62,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.2';
+        $this->version = '1.1.3';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -2476,7 +2476,7 @@ class codwfeeplus extends PaymentModule
                     $order->updateOrderDetailTax();
 
                     // sync all stock
-                    (new StockManager())->updatePhysicalProductQuantity(
+                    (new PrestaShop\PrestaShop\Adapter\StockManager())->updatePhysicalProductQuantity(
                             (int) $order->id_shop, (int) Configuration::get('PS_OS_ERROR'), (int) Configuration::get('PS_OS_CANCELED'), null, (int) $order->id
                     );
                 } else {

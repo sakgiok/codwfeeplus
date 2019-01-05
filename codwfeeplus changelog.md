@@ -1,3 +1,5 @@
+## v1.1.3
+* Fixed a serious bug in payment validation.
 ## v1.1.2
 * Added option for order state after payment.
 * Added some sanity checks for some parameters that might change in Prestashop from the user (tax rules, custom order states, countries , zones etc).
