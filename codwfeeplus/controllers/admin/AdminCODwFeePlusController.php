@@ -29,6 +29,7 @@ include_once _PS_MODULE_DIR_ . 'codwfeeplus/CODwFP.php';
 class AdminCODwFeePlusController extends ModuleAdminController
 {
 
+    public static $definition = array();
     private $_html = '';
     private $_errors = array();
     private $_msg = array();
@@ -61,7 +62,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         array('name' => 'CODWFEEPLUS_MIN', 'type' => 'Price', 'out' => 'minimum cart value', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_MAX', 'type' => 'Price', 'out' => 'maximum cart value', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_CARTVALUE_SIGN', 'type' => 'Int', 'out' => 'cart value comparison', 'multilang' => 0, 'req' => 0),
-        array('name' => 'CODWFEEPLUS_CARTVALUE', 'type' => 'Int', 'out' => 'cart value', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_CARTVALUE', 'type' => 'Price', 'out' => 'cart value', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_CARTVALUE_INCLUDE_CARRIER', 'type' => 'Int', 'out' => 'cart value include carrier', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_DELIVERY_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'carriers', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_COUNTRIES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'countries', 'multilang' => 0, 'req' => 0),
@@ -210,8 +211,6 @@ class AdminCODwFeePlusController extends ModuleAdminController
     public function renderView()
     {
         $this->_html = '';
-        $this->context->controller->addCSS($this->path . 'views/css/style-admin.css');
-        $this->context->controller->addJS($this->path . 'views/js/admin.js');
 
         if (!$this->module->active) {
             $this->_html .= $this->renderModuleInactiveWarning('all');
@@ -255,6 +254,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
     public function postProcess()
     {
+        $this->context->controller->addCSS($this->path . 'views/css/style-admin.css');
+        $this->context->controller->addJS($this->path . 'views/js/admin.js');
+        
         $this->_errors = array();
         $this->_msg = array();
         $this->_condForm_id = null;
@@ -308,6 +310,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             } elseif (isset($this->context->cookie->{$this->list_id . '_start'})) {
                 unset($this->context->cookie->{$this->list_id . '_start'});
             }
+            $this->className = get_class($this);
             $this->processFilter();
             $this->_display_mode = 'view_log';
             if (Tools::isSubmit('submitResetcodwfeeplus_transactions')) {
@@ -962,13 +965,17 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $tree = new HelperTreeCategories('codwfeeplus_test_cat_tree');
         $tree->setUseCheckBox(true)
                 ->setUseSearch(false)
-                ->setIdTree('codwfeeplus_test_cat_tree')
-                ->setFullTree(true)
-                ->setChildrenOnly(true)
-                ->setNoJS(true)
                 ->setRootCategory($root_category)
                 ->setInputName('test_categoryBox')
                 ->setSelectedCategories($test_field_values['tstfrm_category']);
+        if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
+            $tree->setIdTree('codwfeeplus_test_cat_tree');
+        }
+        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+            $tree->setFullTree(true);
+            $tree->setChildrenOnly(true);
+            $tree->setNoJS(false);
+        }
         $categoryTree = $tree->render();
 //token changed because of the category tree... So change it back.
         $this->context->smarty->assign('token', $this->token);
@@ -1402,8 +1409,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $values = $this->getOrderListValues();
         $helper->listTotal = $this->_listTotal;
-        $helper->_default_pagination = $this->_default_pagination;
-        $helper->_pagination = $this->_pagination;
+        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+            $helper->_default_pagination = $this->_default_pagination;
+            $helper->_pagination = $this->_pagination;
+        }
         $helper->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -1650,8 +1659,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
         $values = $this->getConditionListValues();
         $helper->listTotal = count($values);
-        $helper->_default_pagination = 10000;
-        $helper->_pagination = array(10000);
+        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+            $helper->_default_pagination = 10000;
+            $helper->_pagination = array(10000);
+        }
         $helper->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -1701,6 +1712,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'show_filters' => false,
             'icon' => 'icon-list',
         );
+
+        if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '<=')) {
+            $helper->tpl_vars['filters_has_value'] = false;
+        }
 
         $helper->toolbar_btn['new'] = array(
             'href' => $this->context->link->getAdminLink('AdminCODwFeePlus', false)
@@ -2054,7 +2069,6 @@ class AdminCODwFeePlusController extends ModuleAdminController
 //FORM
     public function renderFormConditions($in_cond_id = null, $getfrompost = false)
     {
-//        $this->addJS(_PS_BO_ALL_THEMES_DIR_ . 'default/js/tree.js');
         $carriers = Carrier::getCarriers($this->context->language->id, false, false, false, null, Carrier::ALL_CARRIERS);
         $carriers_list = array();
         foreach ($carriers as $value) {
@@ -2205,13 +2219,17 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $tree = new HelperTreeCategories('codwfeeplus_cat_tree');
         $tree->setUseCheckBox(true)
                 ->setUseSearch(false)
-                ->setIdTree('codwfeeplus_cond_cat_tree')
-                ->setFullTree(true)
-                ->setChildrenOnly(true)
-                ->setNoJS(true)
                 ->setRootCategory($category)
                 ->setInputName('cond_categoryBox')
                 ->setSelectedCategories($fieldValues['categories']);
+        if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
+            $tree->setIdTree('codwfeeplus_cond_cat_tree');
+        }
+        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+            $tree->setFullTree(true);
+            $tree->setChildrenOnly(true);
+            $tree->setNoJS(false);
+        }
         $categoryTree = $tree->render();
 //token changed because of the category tree... So change it back.
         $this->context->smarty->assign('token', $this->token);
@@ -3264,18 +3282,18 @@ class AdminCODwFeePlusController extends ModuleAdminController
     public function getContrastColor($hexColor)
     {
 
-        //////////// hexColor RGB
+//////////// hexColor RGB
         $R1 = hexdec(substr($hexColor, 1, 2));
         $G1 = hexdec(substr($hexColor, 3, 2));
         $B1 = hexdec(substr($hexColor, 5, 2));
 
-        //////////// Black RGB
+//////////// Black RGB
         $blackColor = "#000000";
         $R2BlackColor = hexdec(substr($blackColor, 1, 2));
         $G2BlackColor = hexdec(substr($blackColor, 3, 2));
         $B2BlackColor = hexdec(substr($blackColor, 5, 2));
 
-        //////////// Calc contrast ratio
+//////////// Calc contrast ratio
         $L1 = 0.2126 * pow($R1 / 255, 2.2) +
                 0.7152 * pow($G1 / 255, 2.2) +
                 0.0722 * pow($B1 / 255, 2.2);
@@ -3291,7 +3309,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $contrastRatio = (int) (($L2 + 0.05) / ($L1 + 0.05));
         }
 
-        //////////// If contrast is more than 5, return black color
+//////////// If contrast is more than 5, return black color
         if ($contrastRatio > 5) {
             return '#000000';
         } else { //////////// if not, return white color.

@@ -20,6 +20,7 @@
  *  @copyright 2018 Sakis Gkiokas
  *  @license   https://opensource.org/licenses/GPL-3.0  GNU General Public License version 3
  */
+
 class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
 {
 
@@ -96,11 +97,8 @@ class CODwFeePlusValidationModuleFrontController extends ModuleFrontController
     {
         $currency = $this->context->currency;
         $total = ($cart->getOrderTotal(true, Cart::BOTH) + $CODfee);
-        if ($this->module->is17) {
-            $this->module->validateOrder_AddToCarrier_17($CODfee, (int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
-        } else {
-            $this->module->validateOrder_AddToCarrier_16($CODfee, (int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
-        }
+
+        $this->module->runCorrect_validateOrder($CODfee, (int) $cart->id, $orderstate, $total, $this->module->public_name, null, array(), (int) $currency->id, false, $customer->secure_key);
     }
 
     /**

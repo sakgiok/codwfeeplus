@@ -1,3 +1,9 @@
+## v1.1.4
+* Fixed a bug when a decimal value in the "total cart value" condition's field wasn't valid.
+* Fixed a bug with cart summary not shown correctly on some earlier Prestashop 1.7 versions.
+* Taxes are displayed correctly in cart summary on Prestashop 1.7
+* Improved compatibility with various Prestashop versions when adding the fee to carrier's fee.
+* When reordering an order with COD Product, it will be deleted from the cart automatically (except for some early 1.7 PS versions).
 ## v1.1.3
 * Fixed a serious bug in payment validation.
 ## v1.1.2

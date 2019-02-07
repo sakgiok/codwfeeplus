@@ -22,7 +22,7 @@
 $(document).ready(function () {
 
     function replace_cart_summary(cod_active) {
-        if (!$("#codwfeeplus_payment_infos").length){
+        if (!$("#codwfeeplus_payment_infos").length) {
             return;
         }
         var cart_summary = $("#js-checkout-summary");
@@ -58,8 +58,10 @@ $(document).ready(function () {
 //    });
 //
     $('input[type=radio][name=payment-option]').on("change", null, function () {
-        if ($(this).attr('data-module-name') != 'codwfeeplus') {
-            replace_cart_summary(false);
+        if ($('input[data-module-name="codwfeeplus"]').length) {
+            if ($(this).attr('data-module-name') != 'codwfeeplus') {
+                replace_cart_summary(false);
+            }
         }
     });
 //    $('input[type="radio"]').on('deselect', function () {

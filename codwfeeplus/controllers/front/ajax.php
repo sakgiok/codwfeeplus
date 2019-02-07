@@ -40,34 +40,52 @@ class CODwFeePlusAjaxModuleFrontController extends ModuleFrontController
                 );
 
                 if ($cod_active) {
+                    $taxconfiguration = new TaxConfiguration();
+                    $include_taxes = $taxconfiguration->includeTaxes();
                     $cart_obj = $this->context->cart;
-                    $address_id = $cart_obj->getTaxAddressId();
+                    $address_id = 0;
+
+                    $taxAddressType = Configuration::get('PS_TAX_ADDRESS_TYPE');
+                    if (Validate::isLoadedObject($cart_obj) && !empty($taxAddressType)) {
+                        $address_id = $cart_obj->$taxAddressType;
+                    } else {
+                        $address_id = $cart_obj->id_address_delivery;
+                    }
+
                     $CODfee = $this->module->getCostFromCart($this->context->cart);
 
                     $CODfee_tax = $this->module->getCODFeeTax($cart_obj->id_carrier, $address_id);
 
                     $CODfee_notax = Tools::ps_round(((float) $CODfee) / (1.0 + $CODfee_tax), 9);
                     $CODfee_tax_amount = Tools::ps_round(((float) $CODfee_notax) * $CODfee_tax, 9);
-                    $total_cart = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-                    $total_cart_notax = $this->context->cart->getOrderTotal(false, Cart::BOTH);
+
+                    $CODFee_final = $CODfee;
+                    if (!$include_taxes) {
+                        $CODFee_final = $CODfee_notax;
+                    }
 
                     if (isset($cart['subtotals']['tax'])) {
-                        $total_taxes = $total_cart - $total_cart_notax;
-                        $cart['subtotals']['tax']['amount'] = $total_taxes + $CODfee_tax_amount;
-                        $cart['subtotals']['tax']['value'] = Tools::displayPrice($total_taxes + $CODfee_tax_amount);
+                        $cart['subtotals']['tax']['amount'] += $CODfee_tax_amount;
+                        $cart['subtotals']['tax']['value'] = Tools::displayPrice($cart['subtotals']['tax']['amount']);
                     }
                     $cart['subtotals']['cod'] = array(
-                        'amount' => $CODfee,
+                        'amount' => $CODFee_final,
                         'label' => $this->module->l('Cash on delivery fee', 'ajax'),
                         'type' => 'cod_fee',
-                        'value' => Tools::displayPrice($CODfee),
+                        'value' => Tools::displayPrice($CODFee_final),
                     );
-                    $cart['totals']['total']['amount'] = $total_cart + $CODfee;
-                    $cart['totals']['total']['value'] = Tools::displayPrice($total_cart + $CODfee);
-                    $cart['totals']['total_excluding_tax']['amount'] = $total_cart_notax + $CODfee_notax;
-                    $cart['totals']['total_excluding_tax']['value'] = Tools::displayPrice($total_cart_notax + $CODfee_notax);
-                    $cart['totals']['total_including_tax']['amount'] = $total_cart + $CODfee;
-                    $cart['totals']['total_including_tax']['value'] = Tools::displayPrice($total_cart + $CODfee);
+                    if (isset($cart['totals']['total']['amount'])) {
+                        $cart['totals']['total']['amount'] += $CODFee_final;
+                        $cart['totals']['total']['value'] = Tools::displayPrice($cart['totals']['total']['amount']);
+                    }
+                    if (isset($cart['totals']['total_excluding_tax']['amount'])) {
+                        $cart['totals']['total_excluding_tax']['amount'] += $CODfee_notax;
+                        $cart['totals']['total_excluding_tax']['value'] = Tools::displayPrice($cart['totals']['total_excluding_tax']['amount']);
+                    }
+                    if (isset($cart['totals']['total_including_tax']['amount'])) {
+                        $cart['totals']['total_including_tax']['amount'] += $CODfee;
+                        $cart['totals']['total_including_tax']['value'] = Tools::displayPrice($cart['totals']['total_including_tax']['amount']);
+                    }
                 }
 
                 ob_end_clean();
