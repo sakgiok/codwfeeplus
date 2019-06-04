@@ -31,6 +31,7 @@ include_once _PS_MODULE_DIR_ . 'codwfeeplus/CODwFP.php';
 
 class codwfeeplus extends PaymentModule
 {
+
     private $_html = '';
     private $_postErrors = array();
     public $_testoutput = '';
@@ -63,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.4';
+        $this->version = '1.1.5';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -82,7 +83,7 @@ class codwfeeplus extends PaymentModule
 
         $this->displayName = $this->l('Cash on delivery with fee (COD) PLUS');
         $this->description = $this->l('Accept cash on delivery payments with extra fee and more options');
-        $this->ps_versions_compliancy = array('min' => '1.6.0.0', 'max' => '1.7.99.99');
+        $this->ps_versions_compliancy = array('min' => '1.6.0.6', 'max' => '1.7.99.99');
         $this->public_name = $this->l('Cash on delivery');
         $this->tab_name = $this->l('COD with Fee Plus');
         $this->_integration_general_arr = array(
@@ -1834,30 +1835,38 @@ class codwfeeplus extends PaymentModule
 
     public function runCorrect_validateOrder($fee, $id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $extra_vars = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
-        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16009.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.1', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16101.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.4', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16104.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.23', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16123.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.0.2', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17002.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.0.6', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17006.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.1.2', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17102.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.2.0', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17200.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.2.2', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17202.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.3.0', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17300.php';
-        } elseif (Tools::version_compare(_PS_VERSION_, '1.7.5.0', '<=')) {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+        if ($this->is17) {
+            if (Tools::version_compare(_PS_VERSION_, '1.7.0.2', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17002.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.0.6', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17006.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.1.2', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17102.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.2.0', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17200.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.2.2', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17202.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.3.0', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17300.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.5.0', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+            } else {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+            }
         } else {
-            include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+            if (Tools::version_compare(_PS_VERSION_, '1.6.0.6', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16006.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16009.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.1', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16101.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.4', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16104.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.24', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16123.php';
+            } else {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16123.php';
+            }
         }
     }
 
