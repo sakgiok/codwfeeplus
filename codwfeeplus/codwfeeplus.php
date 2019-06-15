@@ -64,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.5';
+        $this->version = '1.1.6';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -1848,16 +1848,24 @@ class codwfeeplus extends PaymentModule
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17202.php';
             } elseif (Tools::version_compare(_PS_VERSION_, '1.7.3.0', '<=')) {
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17300.php';
-            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.5.0', '<=')) {
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.5.2', '<=')) {
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.7.6.0', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17600.php';
             } else {
-                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17500.php';
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/17600.php';
             }
         } else {
             if (Tools::version_compare(_PS_VERSION_, '1.6.0.6', '<=')) {
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16006.php';
             } elseif (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '<=')) {
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16009.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.0.10', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16010.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.0.11', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16011.php';
+            } elseif (Tools::version_compare(_PS_VERSION_, '1.6.0.14', '<=')) {
+                include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16014.php';
             } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.1', '<=')) {
                 include _PS_MODULE_DIR_ . 'codwfeeplus/validate_functions/16101.php';
             } elseif (Tools::version_compare(_PS_VERSION_, '1.6.1.4', '<=')) {

@@ -971,7 +971,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
             $tree->setIdTree('codwfeeplus_test_cat_tree');
         }
-        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+        if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>=')) {
             $tree->setFullTree(true);
             $tree->setChildrenOnly(true);
             $tree->setNoJS(false);
@@ -2225,7 +2225,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
             $tree->setIdTree('codwfeeplus_cond_cat_tree');
         }
-        if (Tools::version_compare(_PS_VERSION_, '1.6.0.9', '>')) {
+        if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>=')) {
             $tree->setFullTree(true);
             $tree->setChildrenOnly(true);
             $tree->setNoJS(false);
