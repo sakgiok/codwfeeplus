@@ -66,6 +66,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         array('name' => 'CODWFEEPLUS_CARTVALUE_INCLUDE_CARRIER', 'type' => 'Int', 'out' => 'cart value include carrier', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_DELIVERY_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'carriers', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_COUNTRIES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'countries', 'multilang' => 0, 'req' => 0),
+        array('name' => 'CODWFEEPLUS_STATES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'states', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_ZONES_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'zones', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_GROUPS_ARRAY', 'type' => 'ArrayWithIds', 'out' => 'groups', 'multilang' => 0, 'req' => 0),
         array('name' => 'CODWFEEPLUS_MATCHALL_GROUPS', 'type' => 'Int', 'out' => 'match all groups', 'multilang' => 0, 'req' => 0),
@@ -81,6 +82,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         array('name' => 'tstfrm_cartvalue', 'type' => 'Price', 'out' => 'cart value', 'multilang' => 0, 'req' => 0),
         array('name' => 'tstfrm_carriervalue', 'type' => 'Price', 'out' => 'carrier fee', 'multilang' => 0, 'req' => 0),
         array('name' => 'tstfrm_country', 'type' => 'Int', 'out' => 'country', 'multilang' => 0, 'req' => 0),
+        array('name' => 'tstfrm_state', 'type' => 'Int', 'out' => 'state', 'multilang' => 0, 'req' => 0),
         array('name' => 'tstfrm_carrier', 'type' => 'Int', 'out' => 'carrier', 'multilang' => 0, 'req' => 0),
         array('name' => 'tstfrm_group', 'type' => 'ArrayWithIds', 'out' => 'group', 'multilang' => 0, 'req' => 0),
         array('name' => 'test_categoryBox', 'type' => 'ArrayWithIds', 'out' => 'categories', 'multilang' => 0, 'req' => 0),
@@ -256,7 +258,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
     {
         $this->context->controller->addCSS($this->path . 'views/css/style-admin.css');
         $this->context->controller->addJS($this->path . 'views/js/admin.js');
-        
+
         $this->_errors = array();
         $this->_msg = array();
         $this->_condForm_id = null;
@@ -511,10 +513,14 @@ class AdminCODwFeePlusController extends ModuleAdminController
 //Fix description
             $ret['codwfeeplus_desc'] = stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret['codwfeeplus_desc']))));
 //countries
+
+            $countries = array();
+            $states = array();
+            CODwFP::getCountriesandStates($countries, $states);
+
             if (isset($ret['codwfeeplus_countries'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_countries']);
                 $arr2 = array();
-                $countries = Country::getCountries($this->context->language->id, true);
                 $countries_id = array_column($countries, 'id_country');
                 foreach ($arr as $value) {
                     if (in_array($value, $countries_id)) {
@@ -522,6 +528,18 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     }
                 }
                 $ret['codwfeeplus_countries'] = CODwFP::arrayToString($arr2);
+            }
+//states
+            if (isset($ret['codwfeeplus_states'])) {
+                $arr = CODwFP::stringToArray($ret['codwfeeplus_states']);
+                $arr2 = array();
+                $states_id = array_column($states, 'id_state');
+                foreach ($arr as $value) {
+                    if (in_array($value, $states_id)) {
+                        $arr2[] = $value;
+                    }
+                }
+                $ret['codwfeeplus_states'] = CODwFP::arrayToString($arr2);
             }
 //zones
             if (isset($ret['codwfeeplus_zones'])) {
@@ -980,15 +998,25 @@ class AdminCODwFeePlusController extends ModuleAdminController
 //token changed because of the category tree... So change it back.
         $this->context->smarty->assign('token', $this->token);
 
-        if (Configuration::get('PS_RESTRICT_DELIVERED_COUNTRIES')) {
-            $countries = Carrier::getDeliveredCountries($this->context->language->id, true, true);
-        } else {
-            $countries = Country::getCountries($this->context->language->id, true);
-        }
+        $countries = array();
+        $states = array();
+        CODwFP::getCountriesandStates($countries, $states);
+
         $country_list = array();
         foreach ($countries as $value) {
             $country_list[] = array(
                 'id_option' => (int) $value['id_country'],
+                'name' => $value['name'],
+            );
+        }
+//states
+        $state_list[] = array(
+                'id_option' => 0,
+                'name' => $this->l('No state'),
+            );
+        foreach ($states as $value) {
+            $state_list[] = array(
+                'id_option' => (int) $value['id_state'],
                 'name' => $value['name'],
             );
         }
@@ -1022,6 +1050,17 @@ class AdminCODwFeePlusController extends ModuleAdminController
                             'name' => 'name',
                         ),
                         'hint' => $this->l('The country of the delivery address.'),
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Delivery State'),
+                        'name' => 'tstfrm_state',
+                        'options' => array(
+                            'query' => $state_list,
+                            'id' => 'id_option',
+                            'name' => 'name',
+                        ),
+                        'hint' => $this->l('The state of the delivery address.'),
                     ),
                     array(
                         'type' => 'select',
@@ -1123,6 +1162,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'tstfrm_shop' => Tools::getValue('tstfrm_shop', 0),
             'tstfrm_group[]' => Tools::getValue('tstfrm_group', 0),
             'tstfrm_country' => Tools::getValue('tstfrm_country', 0),
+            'tstfrm_state' => Tools::getValue('tstfrm_state', 0),
             'tstfrm_cartvalue' => Tools::getValue('tstfrm_cartvalue', 0),
             'tstfrm_carriervalue' => Tools::getValue('tstfrm_carriervalue', 0),
             'tstfrm_category' => $cat,
@@ -1809,7 +1849,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             }
             $cond_feecalc_text = $this->condList_feecalc_text($val_feetype, $val_fee, $val_feemin, $val_feemax, $val_feepercent);
             $cond_conds_text = $this->condList_conds_text($cartvaluesign_arr[$c->codwfeeplus_cartvalue_sign], $val_array_includecarrierfee['codwfeeplus_cartvalue']
-                    , $val_array['countries'], $val_array['carriers'], $val_array['zones'], $val_array['manufacturers'], $val_array['suppliers'], $val_array['categories'], $val_array['groups']);
+                    , $val_array['countries'], $val_array['states'], $val_array['carriers'], $val_array['zones'], $val_array['manufacturers'], $val_array['suppliers'], $val_array['categories'], $val_array['groups']);
             $tmp = array(
                 'id_codwfeeplus_cond' => $c->id_codwfeeplus_cond,
                 'id_codwfeeplus_cond_array' => $val_id,
@@ -1841,7 +1881,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-    private function condList_conds_text($cartvaluesign, $cartvalue, $countries, $carriers, $zones, $manufacturers, $suppliers, $categories, $groups)
+    private function condList_conds_text($cartvaluesign, $cartvalue, $countries, $states, $carriers, $zones, $manufacturers, $suppliers, $categories, $groups)
     {
         $ret = '';
         $manuf_label = $this->l('Manufacturers');
@@ -1851,6 +1891,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('Cart value is') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_cartvalue($cartvalue, $cartvaluesign) . '</div></div>';
         $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('Carriers:') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_lists($carriers) . '</div></div>';
         $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('Countries:') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_lists($countries) . '</div></div>';
+        $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('States:') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_lists($states) . '</div></div>';
         $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('Zones:') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_lists($zones) . '</div></div>';
         if (Group::isFeatureActive()) {
             $ret .= '<div class="codwfeeplus_sublist_row"><div class="codwfeeplus_sublist_title">' . $this->l('Groups:') . '</div><div class="codwfeeplus_sublist_divider"></div><div class="codwfeeplus_sublist_value">' . $this->callbackCondListTooltip_lists($groups) . '</div></div>';
@@ -2078,15 +2119,22 @@ class AdminCODwFeePlusController extends ModuleAdminController
             );
         }
 
-        if (Configuration::get('PS_RESTRICT_DELIVERED_COUNTRIES')) {
-            $countries = Carrier::getDeliveredCountries($this->context->language->id, true, true);
-        } else {
-            $countries = Country::getCountries($this->context->language->id, true);
-        }
+        $countries = array();
+        $states = array();
+        CODwFP::getCountriesandStates($countries, $states);
+
         $country_list = array();
         foreach ($countries as $value) {
             $country_list[] = array(
                 'id_option' => (int) $value['id_country'],
+                'name' => $value['name'],
+            );
+        }
+
+        $state_list = array();
+        foreach ($states as $value) {
+            $state_list[] = array(
+                'id_option' => (int) $value['id_state'],
                 'name' => $value['name'],
             );
         }
@@ -2516,6 +2564,30 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'type' => 'select',
             'multiple' => true,
             'add_buttons' => true,
+            'label' => $this->l('States List'),
+            'name' => 'CODWFEEPLUS_STATES_ARRAY[]',
+            'tab' => '2',
+            'class' => 'codwfeeplus_admin_select',
+            'desc' => $this->l('Select one or more states to compare to the cart values'),
+            'options' => array(
+                'query' => $state_list,
+                'id' => 'id_option',
+                'name' => 'name',
+            ),
+            'hint' => $this->l('Select (using the Control key) none, one or more States from the list.'),
+        );
+        $fields_form['form']['input'][] = array(
+            'type' => 'html',
+            'html_content' => '<hr class="codwfeeplus_form_hr">',
+            'col' => '12',
+            'label' => '',
+            'name' => 'sep',
+            'tab' => '2',
+        );
+        $fields_form['form']['input'][] = array(
+            'type' => 'select',
+            'multiple' => true,
+            'add_buttons' => true,
             'label' => $this->l('Zone List'),
             'name' => 'CODWFEEPLUS_ZONES_ARRAY[]',
             'tab' => '2',
@@ -2746,6 +2818,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'CODWFEEPLUS_MAX' => $cond->codwfeeplus_fee_max,
                 'CODWFEEPLUS_DELIVERY_ARRAY[]' => $cond->getDeliveryArray(),
                 'CODWFEEPLUS_COUNTRIES_ARRAY[]' => $cond->getCountriesArray(),
+                'CODWFEEPLUS_STATES_ARRAY[]' => $cond->getStatesArray(),
                 'CODWFEEPLUS_ZONES_ARRAY[]' => $cond->getZonesArray(),
                 'CODWFEEPLUS_GROUPS_ARRAY[]' => $cond->getGroupsArray(),
                 'CODWFEEPLUS_MANUFACTURERS_ARRAY[]' => $cond->getManufacturersArray(),
@@ -2777,6 +2850,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'CODWFEEPLUS_MAX' => Tools::getValue('CODWFEEPLUS_MAX'),
                 'CODWFEEPLUS_DELIVERY_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_DELIVERY_ARRAY')),
                 'CODWFEEPLUS_COUNTRIES_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_COUNTRIES_ARRAY')),
+                'CODWFEEPLUS_STATES_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_STATES_ARRAY')),
                 'CODWFEEPLUS_ZONES_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_ZONES_ARRAY')),
                 'CODWFEEPLUS_GROUPS_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_GROUPS_ARRAY')),
                 'CODWFEEPLUS_MANUFACTURERS_ARRAY[]' => $this->_notArrayToEmptyArray(Tools::getValue('CODWFEEPLUS_MANUFACTURERS_ARRAY')),
@@ -2826,7 +2900,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
         $id_zone = Country::getIdZone(Tools::getValue('tstfrm_country'));
         $id_shop = $this->context->shop->id;
-        $this->_test_totfee = $this->module->getCost_common(Tools::getValue('tstfrm_carrier'), Tools::getValue('tstfrm_country'), $id_zone, Tools::getValue('tstfrm_cartvalue'), Tools::getValue('tstfrm_carriervalue'), $cat, $groups, $manufacturers, $suppliers, $id_shop);
+        $this->_test_totfee = $this->module->getCost_common(Tools::getValue('tstfrm_carrier'), Tools::getValue('tstfrm_country'), Tools::getValue('tstfrm_state'), $id_zone, Tools::getValue('tstfrm_cartvalue'), Tools::getValue('tstfrm_carriervalue'), $cat, $groups, $manufacturers, $suppliers, $id_shop);
         $this->_test_result .= $this->module->_testoutput;
 
         $ret &= ($this->_test_result != '');
@@ -2902,6 +2976,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $cond->codwfeeplus_fee_max = Tools::getValue('CODWFEEPLUS_MAX', 0);
         $cond->setDeliveryArray(Tools::getValue('CODWFEEPLUS_DELIVERY_ARRAY', array()));
         $cond->setCountriesArray(Tools::getValue('CODWFEEPLUS_COUNTRIES_ARRAY', array()));
+        $cond->setStatesArray(Tools::getValue('CODWFEEPLUS_STATES_ARRAY', array()));
         $cond->setZonesArray(Tools::getValue('CODWFEEPLUS_ZONES_ARRAY', array()));
         $cond->setManufacturersArray(Tools::getValue('CODWFEEPLUS_MANUFACTURERS_ARRAY', array()));
         $cond->setSuppliersArray(Tools::getValue('CODWFEEPLUS_SUPPLIERS_ARRAY', array()));

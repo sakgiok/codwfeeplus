@@ -1,3 +1,11 @@
+## v1.1.7
+* Added "States" field in conditions to validate against the state of the delivery address.
+## v1.1.6
+* Fixed a bug for some PS versions < 1.6.1.0
+* Added provision for PS version 1.7.6.0
+## v1.1.5
+* Added compatibility for PS 1.6.0.6.
+* Added compatibility for PS 1.6.1.24
 ## v1.1.4
 * Fixed a bug when a decimal value in the "total cart value" condition's field wasn't valid.
 * Fixed a bug with cart summary not shown correctly on some earlier Prestashop 1.7 versions.

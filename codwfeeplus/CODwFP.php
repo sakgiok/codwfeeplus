@@ -33,6 +33,7 @@ class CODwFP
     public $codwfeeplus_condtype = 0; //0 fee - 1 module activation
     public $codwfeeplus_position;
     public $codwfeeplus_countries = '';
+    public $codwfeeplus_states = '';
     public $codwfeeplus_zones = '';
     public $codwfeeplus_carriers = '';
     public $codwfeeplus_categories = '';
@@ -65,6 +66,7 @@ class CODwFP
             'codwfeeplus_active' => 'int',
             'codwfeeplus_condtype' => 'int',
             'codwfeeplus_countries' => 'string',
+            'codwfeeplus_states' => 'string',
             'codwfeeplus_zones' => 'string',
             'codwfeeplus_carriers' => 'string',
             'codwfeeplus_categories' => 'string',
@@ -101,6 +103,7 @@ class CODwFP
                 $this->codwfeeplus_condtype = (int) $conds_db[0]['codwfeeplus_condtype'];
                 $this->codwfeeplus_position = (int) $conds_db[0]['codwfeeplus_position'];
                 $this->codwfeeplus_countries = $conds_db[0]['codwfeeplus_countries'];
+                $this->codwfeeplus_states = $conds_db[0]['codwfeeplus_states'];
                 $this->codwfeeplus_zones = $conds_db[0]['codwfeeplus_zones'];
                 $this->codwfeeplus_carriers = $conds_db[0]['codwfeeplus_carriers'];
                 $this->codwfeeplus_categories = $conds_db[0]['codwfeeplus_categories'];
@@ -134,7 +137,7 @@ class CODwFP
         $sql1 = 'INSERT INTO `' . _DB_PREFIX_ . 'codwfeeplus_conditions` (`codwfeeplus_active`,`codwfeeplus_condtype`,`codwfeeplus_fee`,`codwfeeplus_fee_min`,' .
                 '`codwfeeplus_fee_max`,`codwfeeplus_fee_percent`,`codwfeeplus_fee_type`,`codwfeeplus_integration`,`codwfeeplus_taxrule_id`,'
                 . '`codwfeeplus_orderstate_id`,`codwfeeplus_position`,' .
-                '`codwfeeplus_countries`,`codwfeeplus_zones`,`codwfeeplus_manufacturers`,`codwfeeplus_matchall_manufacturers`,' .
+                '`codwfeeplus_countries`,`codwfeeplus_states`,`codwfeeplus_zones`,`codwfeeplus_manufacturers`,`codwfeeplus_matchall_manufacturers`,' .
                 '`codwfeeplus_suppliers`,`codwfeeplus_matchall_suppliers`,' .
                 '`codwfeeplus_carriers`,`codwfeeplus_categories`,`codwfeeplus_matchall_categories`,' .
                 '`codwfeeplus_groups`,`codwfeeplus_matchall_groups`,`codwfeeplus_shop`,' .
@@ -153,6 +156,7 @@ class CODwFP
                 (int) pSQL($this->codwfeeplus_orderstate_id) . ',' .
                 (int) pSQL($this->codwfeeplus_position) . ',' .
                 '\'' . pSQL($this->codwfeeplus_countries) . '\',' .
+                '\'' . pSQL($this->codwfeeplus_states) . '\',' .
                 '\'' . pSQL($this->codwfeeplus_zones) . '\',' .
                 '\'' . pSQL($this->codwfeeplus_manufacturers) . '\',' .
                 (int) pSQL($this->codwfeeplus_matchall_manufacturers) . ',' .
@@ -183,6 +187,7 @@ class CODwFP
                 ',`codwfeeplus_condtype`=' . (int) pSQL($this->codwfeeplus_condtype) .
                 ',`codwfeeplus_position`=' . (int) pSQL($this->codwfeeplus_position) .
                 ',`codwfeeplus_countries`=\'' . pSQL($this->codwfeeplus_countries) . '\'' .
+                ',`codwfeeplus_states`=\'' . pSQL($this->codwfeeplus_states) . '\'' .
                 ',`codwfeeplus_zones`=\'' . pSQL($this->codwfeeplus_zones) . '\'' .
                 ',`codwfeeplus_manufacturers`=\'' . pSQL($this->codwfeeplus_manufacturers) . '\'' .
                 ',`codwfeeplus_matchall_manufacturers`=' . (int) pSQL($this->codwfeeplus_matchall_manufacturers) .
@@ -268,6 +273,11 @@ class CODwFP
         return $this->stringToArray($this->codwfeeplus_countries);
     }
 
+    public function getStatesArray()
+    {
+        return $this->stringToArray($this->codwfeeplus_states);
+    }
+
     public function getZonesArray()
     {
         return $this->stringToArray($this->codwfeeplus_zones);
@@ -301,6 +311,11 @@ class CODwFP
     public function setCountriesArray($incountries)
     {
         $this->codwfeeplus_countries = $this->arrayToString($incountries);
+    }
+
+    public function setStatesArray($incountries)
+    {
+        $this->codwfeeplus_states = $this->arrayToString($incountries);
     }
 
     public function setZonesArray($inzones)
@@ -389,6 +404,12 @@ class CODwFP
                 'contains_matchall' => 0,
                 'matchall' => 0,
             ),
+            'states' => array(
+                'count' => 0,
+                'title' => '',
+                'contains_matchall' => 0,
+                'matchall' => 0,
+            ),
             'carriers' => array(
                 'count' => 0,
                 'title' => '',
@@ -435,6 +456,18 @@ class CODwFP
             foreach ($countries_arr as $value) {
                 $o = new Country($value);
                 $ret['countries']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name[(int) $lang_id];
+                unset($o);
+                ++$i;
+            }
+        }
+        //states
+        if ($this->codwfeeplus_states != '') {
+            $states_arr = $this->getStatesArray();
+            $ret['states']['count'] = count($states_arr);
+            $i = 0;
+            foreach ($states_arr as $value) {
+                $o = new State($value);
+                $ret['states']['title'] .= ($i > 0 ? '<br/>' : '') . $o->name;
                 unset($o);
                 ++$i;
             }
@@ -550,14 +583,10 @@ class CODwFP
                 $changed = true;
             }
         }
-
+        $countries = array();
+        $states = array();
+        CODwFP::getCountriesandStates($countries, $states);
         if ($this->codwfeeplus_countries != '') {
-            $countries = null;
-            if (Configuration::get('PS_RESTRICT_DELIVERED_COUNTRIES')) {
-                $countries = Carrier::getDeliveredCountries($lang_id, true, true);
-            } else {
-                $countries = Country::getCountries($lang_id, true);
-            }
             $countries_arr = $this->getCountriesArray();
             $new_arr = array();
             foreach ($countries_arr as $value) {
@@ -568,6 +597,19 @@ class CODwFP
                 }
             }
             $this->codwfeeplus_countries = $this->arrayToString($new_arr);
+        }
+
+        if ($this->codwfeeplus_states != '') {
+            $states_arr = $this->getStatesArray();
+            $new_arr = array();
+            foreach ($states_arr as $value) {
+                if (array_search($value, array_column($states, 'id_state')) === false) {
+                    $changed = true;
+                } else {
+                    $new_arr[] = $value;
+                }
+            }
+            $this->codwfeeplus_states = $this->arrayToString($new_arr);
         }
 
         if ($this->codwfeeplus_zones != '') {
@@ -668,6 +710,7 @@ class CODwFP
             'codwfeeplus_active' => $this->codwfeeplus_active,
             'codwfeeplus_condtype' => $this->codwfeeplus_condtype,
             'codwfeeplus_countries' => $this->codwfeeplus_countries,
+            'codwfeeplus_states' => $this->codwfeeplus_states,
             'codwfeeplus_zones' => $this->codwfeeplus_zones,
             'codwfeeplus_carriers' => $this->codwfeeplus_carriers,
             'codwfeeplus_categories' => $this->codwfeeplus_categories,
@@ -714,6 +757,24 @@ class CODwFP
         foreach ($param as $key => $value) {
             if (isset($this->{$key})) {
                 $this->{$key} = $value;
+            }
+        }
+    }
+
+    public static function getCountriesandStates(&$countries, &$states)
+    {
+        $context = Context::getContext();
+        $countries = array();
+        $states = array();
+        if (Configuration::get('PS_RESTRICT_DELIVERED_COUNTRIES')) {
+            $countries = Carrier::getDeliveredCountries($context->language->id, true, true);
+        } else {
+            $countries = Country::getCountries($context->language->id, true);
+        }
+        foreach ($countries as $value) {
+            $s = State::getStatesByIdCountry($value['id_country'], true);
+            foreach ($s as $s1) {
+                $states[] = $s1;
             }
         }
     }

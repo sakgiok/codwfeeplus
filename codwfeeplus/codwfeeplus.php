@@ -64,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.6';
+        $this->version = '1.1.7';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -775,6 +775,16 @@ class codwfeeplus extends PaymentModule
         return $country->name[(int) Configuration::get('PS_LANG_DEFAULT')];
     }
 
+    private function getStateName($id_state)
+    {
+        $ret = 'No state defined in cart';
+        if ($id_state > 0) {
+            $state = new State($id_state);
+            $ret = $state->name;
+        }
+        return $ret;
+    }
+
     private function getZoneName($id_zone)
     {
         $zone = new Zone($id_zone);
@@ -849,6 +859,7 @@ class codwfeeplus extends PaymentModule
         $address = Address::getCountryAndState($params['cart']->id_address_delivery);
         $id_country = $address['id_country'] ? $address['id_country'] : Configuration::get('PS_COUNTRY_DEFAULT');
         $id_zone = Address::getZoneById($params['cart']->id_address_delivery);
+        $id_state = Address::getCountryAndState($params['cart']->id_address_delivery)['id_state'];
         $cartvalue = (float) $params['cart']->getOrderTotal(true, Cart::ONLY_PRODUCTS);
         $carriervalue = (float) $params['cart']->getOrderTotal(true, Cart::ONLY_SHIPPING);
         $cat_array = $this->getCategoriesFromCart($params['cart']->id);
@@ -859,7 +870,7 @@ class codwfeeplus extends PaymentModule
         $manufacturers = $this->getManufacturersFromCart($params['cart']->id);
         $suppliers = $this->getSuppliersFromCart($params['cart']->id);
 
-        return $this->getCost_common($id_carrier, $id_country, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
+        return $this->getCost_common($id_carrier, $id_country, $id_state, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
     }
 
     public function getCostFromCart($cart)
@@ -868,6 +879,7 @@ class codwfeeplus extends PaymentModule
         $id_carrier = $cart->id_carrier;
         $address = Address::getCountryAndState($cart->id_address_delivery);
         $id_country = $address['id_country'] ? $address['id_country'] : Configuration::get('PS_COUNTRY_DEFAULT');
+        $id_state = Address::getCountryAndState($cart->id_address_delivery)['id_state'];
         $id_zone = Address::getZoneById($cart->id_address_delivery);
         $cartvalue = (float) $cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
         $carriervalue = (float) $cart->getOrderTotal(true, Cart::ONLY_SHIPPING);
@@ -879,10 +891,10 @@ class codwfeeplus extends PaymentModule
         $manufacturers = $this->getManufacturersFromCart($cart->id);
         $suppliers = $this->getSuppliersFromCart($cart->id);
 
-        return $this->getCost_common($id_carrier, $id_country, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
+        return $this->getCost_common($id_carrier, $id_country, $id_state, $id_zone, $cartvalue, $carriervalue, $cat_array, $cust_group, $manufacturers, $suppliers, $id_shop);
     }
 
-    public function getCost_common($id_carrier, $id_country, $id_zone, $cartvalue, $carriervalue, $categories_array, $cust_group, $manufacturers_array, $suppliers_array, $id_shop)
+    public function getCost_common($id_carrier, $id_country, $id_state, $id_zone, $cartvalue, $carriervalue, $categories_array, $cust_group, $manufacturers_array, $suppliers_array, $id_shop)
     {
         $fee_arr = array();
         $ret = 0;
@@ -911,6 +923,7 @@ class codwfeeplus extends PaymentModule
                 . '<li>Carrier\'s fee Value: <span class="codwfeeplus_bold_price">' . Tools::displayPrice($carriervalue) . '</span></li>'
                 . '<li>Carrier: <span class="codwfeeplus_bold_txt">' . $this->getCarrierName($id_carrier) . '</span></li>'
                 . '<li>Country: <span class="codwfeeplus_bold_txt">' . $this->getCountryName($id_country) . '</span></li>'
+                . '<li>State: <span class="codwfeeplus_bold_txt">' . $this->getStateName($id_state) . '</span></li>'
                 . '<li>Zone: <span class="codwfeeplus_bold_txt">' . $this->getZoneName($id_zone) . '</span></li>';
 
         $this->_testoutput .= '<li>Groups: ';
@@ -989,7 +1002,7 @@ class codwfeeplus extends PaymentModule
                     $cond_type_fee = false;
                     $cond_type_txt = 'Type: <span class="codwfeeplus_bold_txt">PAYMENT METHOD DEACTIVATION</span>';
                 }
-                $cond_valid = $this->checkCondValid($c, $id_carrier, $id_country, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop);
+                $cond_valid = $this->checkCondValid($c, $id_carrier, $id_country, $id_state, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop);
                 $this->_testoutput .= '<div class="codwfeeplus_' . ($cond_valid ? 'cond_passed' : 'cond_failed') . '">'
                         . '<p>Checking condition with id# <span class="codwfeeplus_bold_txt">' . $c->id_codwfeeplus_cond . '</span>. ' . $cond_type_txt . '</p>';
                 $this->_testoutput .= $this->_testoutput_check;
@@ -1140,7 +1153,7 @@ class codwfeeplus extends PaymentModule
         return $CODfee_tax;
     }
 
-    private function checkCondValid(CODwFP $c, $id_carrier, $id_country, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop)
+    private function checkCondValid(CODwFP $c, $id_carrier, $id_country, $id_state, $id_zone, $categories_array, $cartvalue, $carriervalue, $cust_group, $manufacturers_array, $suppliers_array, $id_shop)
     {
         $this->_testoutput_check = '<div class="codwfeeplus_cond_check_steps"><ul>';
         $apply_cond = false;
@@ -1158,6 +1171,19 @@ class codwfeeplus extends PaymentModule
                 $apply_cond &= $t;
             } else {
                 $this->_testoutput_check .= '<li  class="codwfeeplus_cond_neutral">Condition doesn\'t have any countries defined.</li>';
+            }
+
+            if ($c->codwfeeplus_states !== '') {
+                $v = $this->statesArrToText($c->codwfeeplus_states);
+                $t = $this->checkListID($c->codwfeeplus_states, $id_state);
+                if ($t) {
+                    $this->_testoutput_check .= '<li class="codwfeeplus_cond_success">Submitted state matched condition\'s states (' . $v . ').</li>';
+                } else {
+                    $this->_testoutput_check .= '<li  class="codwfeeplus_cond_error">Submitted state didn\'t match condition\'s states (' . $v . ').</li>';
+                }
+                $apply_cond &= $t;
+            } else {
+                $this->_testoutput_check .= '<li  class="codwfeeplus_cond_neutral">Condition doesn\'t have any states defined.</li>';
             }
 
             if ($c->codwfeeplus_carriers !== '') {
@@ -1483,6 +1509,21 @@ class codwfeeplus extends PaymentModule
         foreach ($inArr as $value) {
             $c = new Country($value);
             $ret .= ($i > 0 ? ' ,' : '') . $c->name[(int) Configuration::get('PS_LANG_DEFAULT')];
+            unset($c);
+            ++$i;
+        }
+
+        return $ret;
+    }
+
+    private function statesArrToText($inliststr)
+    {
+        $ret = '';
+        $i = 0;
+        $inArr = explode('|', $inliststr);
+        foreach ($inArr as $value) {
+            $c = new State($value);
+            $ret .= ($i > 0 ? ' ,' : '') . $c->name;
             unset($c);
             ++$i;
         }
