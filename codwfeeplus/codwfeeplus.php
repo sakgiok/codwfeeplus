@@ -64,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.7';
+        $this->version = '1.1.8';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -466,12 +466,13 @@ class codwfeeplus extends PaymentModule
                           `codwfeeplus_integration` int(2) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_taxrule_id` int(2) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_orderstate_id` int(2) unsigned NOT NULL DEFAULT \'0\',
-			  `codwfeeplus_active` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
+						  `codwfeeplus_active` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_condtype` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_fee_percent_include_carrier` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_cartvalue_include_carrier` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
                           `codwfeeplus_position` int(10) unsigned NOT NULL,
                           `codwfeeplus_countries` TEXT,
+						  `codwfeeplus_states` TEXT,
                           `codwfeeplus_carriers` TEXT,
                           `codwfeeplus_zones` TEXT,
                           `codwfeeplus_manufacturers` TEXT,

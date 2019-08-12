@@ -2,7 +2,7 @@
 <module>
 <name>codwfeeplus</name>
     <displayName><![CDATA[Cash on delivery with fee (COD) PLUS]]></displayName>
-    <version><![CDATA[1.1.7]]></version>
+    <version><![CDATA[1.1.8]]></version>
     <description><![CDATA[Accept cash on delivery payments with extra fee and more options]]></description>
     <author><![CDATA[Sakis Gkiokas]]></author>
     <tab><![CDATA[payments_gateways]]></tab>

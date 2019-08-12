@@ -1,3 +1,5 @@
+## v1.1.8
+* Fixed a bug that prevented the module from working when a fresh install was made.
 ## v1.1.7
 * Added "States" field in conditions to validate against the state of the delivery address.
 ## v1.1.6
