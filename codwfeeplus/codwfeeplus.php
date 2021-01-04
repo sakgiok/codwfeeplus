@@ -1300,18 +1300,7 @@ class codwfeeplus extends PaymentModule
                 if ($addCarrier) {
                     $tot += $carriervalue;
                 }
-                if ($c->codwfeeplus_cartvalue_sign == 0) {  // >=
-                    $sign = 'greater or equal';
-                    $t = $this->firstGreaterorEqualtoSecond($tot, (float) $c->codwfeeplus_cartvalue);
-                } else {
-                    $sign = 'less or equal';
-                    $t = $this->firstLesserorEqualtoSecond($tot, (float) $c->codwfeeplus_cartvalue);
-                }
-                $txt = 'Submitted cart value ';
-                if ($addCarrier) {
-                    $txt = 'Submitted cart value (including carrier\'s fee) ';
-                }
-                $cur = $this->context->currency;
+		$cur = $this->context->currency;
                 $def_cur = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
                 $cond_value = (float) $c->codwfeeplus_cartvalue;
                 $cond_value_txt = '<span class="codwfeeplus_bold_price">' . Tools::displayPrice($cond_value) . '</span>';
@@ -1320,6 +1309,18 @@ class codwfeeplus extends PaymentModule
                     $cond_value = Tools::convertPriceFull($cond_value, null, $cur);
                     $cond_value_txt = '(<span class="codwfeeplus_bold_price">' . Tools::displayPrice($old_cond_value, $def_cur) . '</span> =>)<span class="codwfeeplus_bold_price">' . Tools::displayPrice($cond_value) . '</span>';
                 }
+                if ($c->codwfeeplus_cartvalue_sign == 0) {  // >=
+                    $sign = 'greater or equal';
+                    $t = $this->firstGreaterorEqualtoSecond($tot, (float) $cond_value);
+                } else {
+                    $sign = 'less or equal';
+                    $t = $this->firstLesserorEqualtoSecond($tot, (float) $cond_value);
+                }
+                $txt = 'Submitted cart value ';
+                if ($addCarrier) {
+                    $txt = 'Submitted cart value (including carrier\'s fee) ';
+                }
+                
                 if ($t) {
                     $this->_testoutput_check .= '<li class="codwfeeplus_cond_success">' . $txt . 'matched condition\'s cart value (<span class="codwfeeplus_bold_txt">' . $sign . '</span> than ' . $cond_value_txt . ').</li>';
                 } else {
