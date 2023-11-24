@@ -90,7 +90,7 @@ class CODwFeePlusAjaxModuleFrontController extends ModuleFrontController
 
                 ob_end_clean();
                 header('Content-Type: application/json');
-                $this->ajaxDie(Tools::jsonEncode(
+                $this->ajaxDie(json_encode(
                                 array(
                                     'preview' => $this->render('checkout/_partials/cart-summary', array(
                                         'cart' => $cart,

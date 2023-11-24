@@ -64,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.8';
+        $this->version = '1.1.9';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
@@ -83,7 +83,7 @@ class codwfeeplus extends PaymentModule
 
         $this->displayName = $this->l('Cash on delivery with fee (COD) PLUS');
         $this->description = $this->l('Accept cash on delivery payments with extra fee and more options');
-        $this->ps_versions_compliancy = array('min' => '1.6.0.6', 'max' => '1.7.99.99');
+        $this->ps_versions_compliancy = array('min' => '1.6.0.6', 'max' => '8.99.99');
         $this->public_name = $this->l('Cash on delivery');
         $this->tab_name = $this->l('COD with Fee Plus');
         $this->_integration_general_arr = array(

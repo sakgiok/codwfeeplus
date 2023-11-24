@@ -1,3 +1,5 @@
+## v1.1.9
+* Added compatibility for PS 8.0.4.
 ## v1.1.8
 * Fixed a bug that prevented the module from working when a fresh install was made.
 ## v1.1.7
