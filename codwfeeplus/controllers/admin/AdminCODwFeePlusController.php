@@ -174,7 +174,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
         parent::initPageHeaderToolbar();
         $this->context->smarty->clearAssign('help_link');
-//        $this->context->smarty->assign('help_link', 'index.php?controller=' . Tools::getValue('controller') . '?token=' . $this->token . '&ajax=1&action=OpenHelp');
+        //        $this->context->smarty->assign('help_link', 'index.php?controller=' . Tools::getValue('controller') . '?token=' . $this->token . '&ajax=1&action=OpenHelp');
     }
 
     private function renderMessages()
@@ -203,7 +203,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret = '';
         if ($this->_test_result != '') {
             $ret .= '<div id="codwfeeplus_test_result_panel" class="panel codwfeeplus_test_panel col-lg-12"><div class="panel-heading">'
-                    . '<i class="icon-money"></i>       Total Cost <span class="badge">' . $this->_test_totfee . $this->_defCurrencySuffix . '</span></div>';
+                . '<i class="icon-money"></i>       Total Cost <span class="badge">' . $this->_test_totfee . $this->_defCurrencySuffix . '</span></div>';
             $ret .= $this->_test_result . '</div>';
         }
 
@@ -306,7 +306,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 $start = $this->context->cookie->{$this->list_id . '_start'};
             }
 
-// Either save or reset the offset in the cookie
+            // Either save or reset the offset in the cookie
             if ($start) {
                 $this->context->cookie->{$this->list_id . '_start'} = $start;
             } elseif (isset($this->context->cookie->{$this->list_id . '_start'})) {
@@ -355,7 +355,6 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 $this->_orderList_parameters['pagination']['selected_pagination'] = Tools::getValue('codwfeeplus_transactions_pagination');
             }
             if (Tools::isSubmit('submitFilter') || $this->context->cookie->{'submitFilter'} !== false) {
-                
             }
         } elseif (Tools::isSubmit('submitCODwFeePlusConfig')) {
             if ($this->_validate_conf()) {
@@ -510,9 +509,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $ret = null;
         if (is_array($param) && count($param)) {
             $ret = $param;
-//Fix description
+            //Fix description
             $ret['codwfeeplus_desc'] = stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret['codwfeeplus_desc']))));
-//countries
+            //countries
 
             $countries = array();
             $states = array();
@@ -529,7 +528,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_countries'] = CODwFP::arrayToString($arr2);
             }
-//states
+            //states
             if (isset($ret['codwfeeplus_states'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_states']);
                 $arr2 = array();
@@ -541,7 +540,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_states'] = CODwFP::arrayToString($arr2);
             }
-//zones
+            //zones
             if (isset($ret['codwfeeplus_zones'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_zones']);
                 $arr2 = array();
@@ -554,7 +553,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_zones'] = CODwFP::arrayToString($arr2);
             }
-//carriers
+            //carriers
             if (isset($ret['codwfeeplus_carriers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_carriers']);
                 $arr2 = array();
@@ -567,7 +566,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_carriers'] = CODwFP::arrayToString($arr2);
             }
-//groups
+            //groups
             if (isset($ret['codwfeeplus_groups'])) {
                 if (Group::isFeatureActive()) {
                     $arr = CODwFP::stringToArray($ret['codwfeeplus_groups']);
@@ -584,7 +583,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     $ret['codwfeeplus_groups'] = '';
                 }
             }
-//categories
+            //categories
             if (isset($ret['codwfeeplus_categories'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_categories']);
                 $arr2 = array();
@@ -597,7 +596,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_categories'] = CODwFP::arrayToString($arr2);
             }
-//manufacturers
+            //manufacturers
             if (isset($ret['codwfeeplus_manufacturers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_manufacturers']);
                 $arr2 = array();
@@ -610,7 +609,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_manufacturers'] = CODwFP::arrayToString($arr2);
             }
-//suppliers
+            //suppliers
             if (isset($ret['codwfeeplus_suppliers'])) {
                 $arr = CODwFP::stringToArray($ret['codwfeeplus_suppliers']);
                 $arr2 = array();
@@ -623,7 +622,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 }
                 $ret['codwfeeplus_suppliers'] = CODwFP::arrayToString($arr2);
             }
-//order states
+            //order states
             if (isset($ret['codwfeeplus_orderstate_id'])) {
                 $os = OrderState::getOrderStates($this->context->language->id);
                 $os_id = array_column($os, 'id_order_state');
@@ -810,7 +809,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (is_array($id_array)) {
             foreach ($id_array as $value) {
                 $ret &= Db::getInstance()->execute('UPDATE `' . _DB_PREFIX_ . 'codwfeeplus_conditions` '
-                        . 'SET `codwfeeplus_active`=0 WHERE `id_codwfeeplus_cond`=' . $value);
+                    . 'SET `codwfeeplus_active`=0 WHERE `id_codwfeeplus_cond`=' . $value);
             }
         }
         if ($ret) {
@@ -831,7 +830,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         if (is_array($id_array)) {
             foreach ($id_array as $value) {
                 $ret &= Db::getInstance()->execute('UPDATE `' . _DB_PREFIX_ . 'codwfeeplus_conditions` '
-                        . 'SET `codwfeeplus_active`=1 WHERE `id_codwfeeplus_cond`=' . $value);
+                    . 'SET `codwfeeplus_active`=1 WHERE `id_codwfeeplus_cond`=' . $value);
             }
         }
         if ($ret) {
@@ -843,7 +842,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-//HELP FORM
+    //HELP FORM
 
     public function renderHelpForm($ajax = false, $check_update = false, $hide = true)
     {
@@ -898,7 +897,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-//TEST FORM
+    //TEST FORM
 
     public function renderTestForm($hide = true)
     {
@@ -982,10 +981,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $tree = new HelperTreeCategories('codwfeeplus_test_cat_tree');
         $tree->setUseCheckBox(true)
-                ->setUseSearch(false)
-                ->setRootCategory($root_category)
-                ->setInputName('test_categoryBox')
-                ->setSelectedCategories($test_field_values['tstfrm_category']);
+            ->setUseSearch(false)
+            ->setRootCategory($root_category)
+            ->setInputName('test_categoryBox')
+            ->setSelectedCategories($test_field_values['tstfrm_category']);
         if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
             $tree->setIdTree('codwfeeplus_test_cat_tree');
         }
@@ -995,7 +994,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $tree->setNoJS(false);
         }
         $categoryTree = $tree->render();
-//token changed because of the category tree... So change it back.
+        //token changed because of the category tree... So change it back.
         $this->context->smarty->assign('token', $this->token);
 
         $countries = array();
@@ -1009,11 +1008,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'name' => $value['name'],
             );
         }
-//states
+        //states
         $state_list[] = array(
-                'id_option' => 0,
-                'name' => $this->l('No state'),
-            );
+            'id_option' => 0,
+            'name' => $this->l('No state'),
+        );
         foreach ($states as $value) {
             $state_list[] = array(
                 'id_option' => (int) $value['id_state'],
@@ -1135,11 +1134,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $ret = '';
         $ret .= '<div class="bootstrap" id="codwfeeplustestblock">'
-                . '<div class="panel">'
-                . '<div class="panel-heading"' . $js_hide . '>'
-                . '<i class="icon-tasks"></i>'
-                . '   ' . $this->l('Test conditions') . $span_hide
-                . '</div>';
+            . '<div class="panel">'
+            . '<div class="panel-heading"' . $js_hide . '>'
+            . '<i class="icon-tasks"></i>'
+            . '   ' . $this->l('Test conditions') . $span_hide
+            . '</div>';
 
         $ret .= $helper->generateForm(array('form' => $fields_form));
 
@@ -1173,7 +1172,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-//CONFIG FORM
+    //CONFIG FORM
 
     public function renderConfigForm($hide = false, $getFromPost = false)
     {
@@ -1291,9 +1290,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                         'is_bool' => true,
                         'values' => array(
                             array(
+                                'id' => 'active_on',
                                 'value' => 1,
                             ),
                             array(
+                                'id' => 'active_off',
                                 'value' => 0,
                             ),
                         ),
@@ -1331,9 +1332,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'is_bool' => true,
                 'values' => array(
                     array(
+                        'id' => 'active_on',
                         'value' => 1,
                     ),
                     array(
+                        'id' => 'active_off',
                         'value' => 0,
                     ),
                 ),
@@ -1388,10 +1391,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $ret = '';
         $ret .= '<div class="bootstrap" id="codwfeeplusconfigblock">'
-                . '<div class="panel">'
-                . '<div class="panel-heading"' . $js_hide . '>'
-                . '<i class="icon-cogs"></i>'
-                . '   ' . $this->l('Configuration') . $span_hide . '</div>';
+            . '<div class="panel">'
+            . '<div class="panel-heading"' . $js_hide . '>'
+            . '<i class="icon-cogs"></i>'
+            . '   ' . $this->l('Configuration') . $span_hide . '</div>';
         $ret .= $helper->generateForm(array('form' => $fields_form));
 
         $ret .= '</div></div>';
@@ -1432,7 +1435,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-//LOG LIST
+    //LOG LIST
     protected function renderOrderList()
     {
         $helper = new HelperList();
@@ -1624,7 +1627,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $tpl->assign(array(
             'href' => $this->context->link->getAdminLink('AdminCODwFeePlus', true) . '&submitCODwFeePlusActionExportcond=1'
-            . '&CODwFeePlusActionExportcond_condId=' . $id,
+                . '&CODwFeePlusActionExportcond_condId=' . $id,
             'action' => $this->l('Export'),
             'class' => 'action-export-cond',
             'icon' => 'icon-share-square',
@@ -1640,7 +1643,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $tpl->assign(array(
             'href' => $this->context->link->getAdminLink('AdminCODwFeePlus', true) . '&submitCODwFeePlusActionDuplicatecond=1'
-            . '&CODwFeePlusActionDuplicatecond_condId=' . $id,
+                . '&CODwFeePlusActionDuplicatecond_condId=' . $id,
             'action' => $this->l('Duplicate'),
             'class' => 'action-duplicate-cond',
             'icon' => 'icon-copy',
@@ -1662,7 +1665,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     if ($value != $current_shop) {
                         $buttons[] = array(
                             'href' => $this->context->link->getAdminLink('AdminCODwFeePlus', true) . '&submitCODwFeePlusActionCopyToShop=1'
-                            . '&CODwFeePlusActionCopyToShop_shopId=' . $value . '&CODwFeePlusActionCopyToShop_condId=' . $id,
+                                . '&CODwFeePlusActionCopyToShop_shopId=' . $value . '&CODwFeePlusActionCopyToShop_condId=' . $id,
                             'action' => $this->l('Copy to shop') . ' ' . $this->module->getShopName($value),
                             'class' => 'action-copy-to-shop',
                             'icon' => 'icon-paperclip',
@@ -1678,7 +1681,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $tpl->fetch();
     }
 
-//LIST
+    //LIST
     protected function renderConditionsList()
     {
         $helper = new HelperList();
@@ -1759,7 +1762,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         $helper->toolbar_btn['new'] = array(
             'href' => $this->context->link->getAdminLink('AdminCODwFeePlus', false)
-            . '&submitCODwFeePlus_add=1&token=' . Tools::getAdminTokenLite('AdminCODwFeePlus'),
+                . '&submitCODwFeePlus_add=1&token=' . Tools::getAdminTokenLite('AdminCODwFeePlus'),
             'desc' => $this->l('Add new condition'),
         );
 
@@ -1848,8 +1851,18 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 $row_class = 'codwfeeplus_condlist_type_paymethod';
             }
             $cond_feecalc_text = $this->condList_feecalc_text($val_feetype, $val_fee, $val_feemin, $val_feemax, $val_feepercent);
-            $cond_conds_text = $this->condList_conds_text($cartvaluesign_arr[$c->codwfeeplus_cartvalue_sign], $val_array_includecarrierfee['codwfeeplus_cartvalue']
-                    , $val_array['countries'], $val_array['states'], $val_array['carriers'], $val_array['zones'], $val_array['manufacturers'], $val_array['suppliers'], $val_array['categories'], $val_array['groups']);
+            $cond_conds_text = $this->condList_conds_text(
+                $cartvaluesign_arr[$c->codwfeeplus_cartvalue_sign],
+                $val_array_includecarrierfee['codwfeeplus_cartvalue'],
+                $val_array['countries'],
+                $val_array['states'],
+                $val_array['carriers'],
+                $val_array['zones'],
+                $val_array['manufacturers'],
+                $val_array['suppliers'],
+                $val_array['categories'],
+                $val_array['groups']
+            );
             $tmp = array(
                 'id_codwfeeplus_cond' => $c->id_codwfeeplus_cond,
                 'id_codwfeeplus_cond_array' => $val_id,
@@ -1927,9 +1940,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $ret = '--';
         } else {
             $ret = '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
-                    . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip . '">'
-                    . $text
-                    . '</span>';
+                . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip . '">'
+                . $text
+                . '</span>';
         }
 
         return $ret;
@@ -1945,9 +1958,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $tooltip = $this->l('This condition is used to define if module will be active.');
         }
         $ret = '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
-                . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip . '">'
-                . $text
-                . '</span>';
+            . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip . '">'
+            . $text
+            . '</span>';
 
         return $ret;
     }
@@ -1961,13 +1974,13 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $fcolor = $this->getContrastColor($color);
             unset($os);
             $ret = '<div style="background-color: ' . $color . '; color: ' . $fcolor . '; padding: 5px; display: inline-block;" >'
-                    . $text
-                    . '</div>';
+                . $text
+                . '</div>';
         } else {
             $text = $this->l('Use default');
             $ret = '<span>'
-                    . $text
-                    . '</span>';
+                . $text
+                . '</span>';
         }
         return $ret;
     }
@@ -1992,9 +2005,9 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $val = number_format(Tools::ps_round((float) $param['val']['value'], $decimal), 2, '.', '') . ' %';
         if ($param['condtype'] == 0) {
             $ret = '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
-                    . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip_text . '">'
-                    . $val . $mark
-                    . '</span>';
+                . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip_text . '">'
+                . $val . $mark
+                . '</span>';
         } else {
             $ret = $this->_def_NA_icon;
         }
@@ -2024,10 +2037,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $val = Tools::displayPrice($cartvalue['value']);
 
         $ret = '<span class="codwfeeplus_cartvalue_sign">' . $cartvaluesign . '</span>'
-                . '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
-                . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip_text . '">'
-                . $val . $mark
-                . '</span>';
+            . '<span class="label-tooltip codwfeeplus_condlist_tooltip" '
+            . 'data-toggle="tooltip" data-html="true" title="" data-original-title="' . $tooltip_text . '">'
+            . $val . $mark
+            . '</span>';
 
         return $ret;
     }
@@ -2052,11 +2065,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $decimal = 2;
         if ($param['condtype'] == 0) {
             $text = $param['val'];
-//            if ($param['val'] == '--') {
-//                $text = $param['val'];
-//            } else {
-//                $text = number_format(Tools::ps_round((float) $param['val'], $decimal), 2, '.', '') . ' %';
-//            }
+            //            if ($param['val'] == '--') {
+            //                $text = $param['val'];
+            //            } else {
+            //                $text = number_format(Tools::ps_round((float) $param['val'], $decimal), 2, '.', '') . ' %';
+            //            }
         } else {
             $text = $this->_def_NA_icon;
         }
@@ -2107,7 +2120,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret1;
     }
 
-//FORM
+    //FORM
     public function renderFormConditions($in_cond_id = null, $getfrompost = false)
     {
         $carriers = Carrier::getCarriers($this->context->language->id, false, false, false, null, Carrier::ALL_CARRIERS);
@@ -2266,10 +2279,10 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $category = Category::getRootCategory()->id;
         $tree = new HelperTreeCategories('codwfeeplus_cat_tree');
         $tree->setUseCheckBox(true)
-                ->setUseSearch(false)
-                ->setRootCategory($category)
-                ->setInputName('cond_categoryBox')
-                ->setSelectedCategories($fieldValues['categories']);
+            ->setUseSearch(false)
+            ->setRootCategory($category)
+            ->setInputName('cond_categoryBox')
+            ->setSelectedCategories($fieldValues['categories']);
         if (Tools::version_compare(_PS_VERSION_, '1.6.1.0', '>')) {
             $tree->setIdTree('codwfeeplus_cond_cat_tree');
         }
@@ -2279,7 +2292,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $tree->setNoJS(false);
         }
         $categoryTree = $tree->render();
-//token changed because of the category tree... So change it back.
+        //token changed because of the category tree... So change it back.
         $this->context->smarty->assign('token', $this->token);
 
         $title = '';
@@ -2326,9 +2339,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'ec_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'ec_off',
                     'value' => 0,
                 ),
             ),
@@ -2438,9 +2453,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'ic_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'ic_off',
                     'value' => 0,
                 ),
             ),
@@ -2496,9 +2513,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'icv_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'icv_off',
                     'value' => 0,
                 ),
             ),
@@ -2634,9 +2653,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
                 'is_bool' => true,
                 'values' => array(
                     array(
+                        'id' => 'mag_on',
                         'value' => 1,
                     ),
                     array(
+                        'id' => 'mag_off',
                         'value' => 0,
                     ),
                 ),
@@ -2686,9 +2707,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'mac_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'mac_off',
                     'value' => 0,
                 ),
             ),
@@ -2727,9 +2750,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'mam_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'mam_off',
                     'value' => 0,
                 ),
             ),
@@ -2767,9 +2792,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             'is_bool' => true,
             'values' => array(
                 array(
+                    'id' => 'mas_on',
                     'value' => 1,
                 ),
                 array(
+                    'id' => 'mas_off',
                     'value' => 0,
                 ),
             ),
@@ -2874,7 +2901,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret;
     }
 
-//postproccess
+    //postproccess
 
     private function _postproccess_testForm()
     {
@@ -3077,7 +3104,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return $ret & $ret2 & $ret3;
     }
 
-//Validation
+    //Validation
 
     private function _validate_testForm()
     {
@@ -3188,7 +3215,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         return true;
     }
 
-//Positions
+    //Positions
 
     public function ajaxProcessUpdatePositions()
     {
@@ -3210,22 +3237,22 @@ class AdminCODwFeePlusController extends ModuleAdminController
                     $position = (int) $position;
 
                     if ($cond = Db::getInstance()->executeS(
-                            'SELECT `id_codwfeeplus_cond`,
+                        'SELECT `id_codwfeeplus_cond`,
                             `codwfeeplus_position`
                         FROM `' . _DB_PREFIX_ . 'codwfeeplus_conditions`
                         WHERE `id_codwfeeplus_cond` = ' . $id . '
                         LIMIT 1'
-                            )) {
+                    )) {
                         Db::getInstance()->execute(
-                                'UPDATE `' . _DB_PREFIX_ . 'codwfeeplus_conditions`
+                            'UPDATE `' . _DB_PREFIX_ . 'codwfeeplus_conditions`
                         SET `codwfeeplus_position` = `codwfeeplus_position` ' .
                                 ($way ? '- 1' : '+ 1') . '
                         WHERE `codwfeeplus_position`' . (
-                                $way ?
-                                        ' > ' . (int) $cond[0]['codwfeeplus_position'] .
-                                        ' AND `codwfeeplus_position` <= ' . $position :
-                                        ' < ' . (int) $cond[0]['codwfeeplus_position'] .
-                                        ' AND `codwfeeplus_position` >= ' . $position
+                                    $way ?
+                                    ' > ' . (int) $cond[0]['codwfeeplus_position'] .
+                                    ' AND `codwfeeplus_position` <= ' . $position :
+                                    ' < ' . (int) $cond[0]['codwfeeplus_position'] .
+                                    ' AND `codwfeeplus_position` >= ' . $position
                                 ) . $where_shop . ';
                         UPDATE `' . _DB_PREFIX_ . 'codwfeeplus_conditions`
                         SET `codwfeeplus_position` = ' . $position . '
@@ -3239,7 +3266,7 @@ class AdminCODwFeePlusController extends ModuleAdminController
         }
     }
 
-//Various
+    //Various
 
     private function _sortOrderStatuses($a, $b)
     {
@@ -3268,13 +3295,13 @@ class AdminCODwFeePlusController extends ModuleAdminController
 
         if ($p_exists) {
             $ret .= '<div class="codwfeeplus_productstatus_true">'
-                    . '<p>' . $this->l('COD product found in database. Product ID:') . ' '
-                    . '<a href="' . $this->context->link->getAdminLink('AdminProducts', true) . '&id_product=' . $pid . '&updateproduct">' . $pid . '</a></p>'
-                    . '</div>';
+                . '<p>' . $this->l('COD product found in database. Product ID:') . ' '
+                . '<a href="' . $this->context->link->getAdminLink('AdminProducts', true) . '&id_product=' . $pid . '&updateproduct">' . $pid . '</a></p>'
+                . '</div>';
         } else {
             $ret .= '<div class="codwfeeplus_productstatus_false">'
-                    . '<p>' . $this->l('COD product was not found in database. Use the button to recreate it.') . ' (Product ID: ' . $pid . ')</p>'
-                    . '</div>';
+                . '<p>' . $this->l('COD product was not found in database. Use the button to recreate it.') . ' (Product ID: ' . $pid . ')</p>'
+                . '</div>';
         }
         $ret .= '</div>';
 
@@ -3303,14 +3330,14 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $name = $this->l('Message');
         $icon = 'icon-envelope';
         $content = '<div class="alert alert-warning">'
-                . '<p>' . $this->l('This content is only avaliable when a store is selected in a multistore installation.') . '</p>'
-                . '</div>';
+            . '<p>' . $this->l('This content is only avaliable when a store is selected in a multistore installation.') . '</p>'
+            . '</div>';
         $ret = '';
         $ret .= '<div class="panel col-lg-12">'
-                . '<div class="panel-heading">'
-                . '<i class="' . $icon . '"></i>'
-                . '   ' . $name
-                . '</div>';
+            . '<div class="panel-heading">'
+            . '<i class="' . $icon . '"></i>'
+            . '   ' . $name
+            . '</div>';
         $ret .= $content;
         $ret .= '</div>';
 
@@ -3322,14 +3349,14 @@ class AdminCODwFeePlusController extends ModuleAdminController
         $name = $this->l('Message');
         $icon = 'icon-envelope';
         $content = '<div class="alert alert-danger">'
-                . '<p>' . $this->l('The module is not active. Please activate it.') . '</p>'
-                . '</div>';
+            . '<p>' . $this->l('The module is not active. Please activate it.') . '</p>'
+            . '</div>';
         $ret = '';
         $ret .= '<div class="panel col-lg-12">'
-                . '<div class="panel-heading">'
-                . '<i class="' . $icon . '"></i>'
-                . '   ' . $name
-                . '</div>';
+            . '<div class="panel-heading">'
+            . '<i class="' . $icon . '"></i>'
+            . '   ' . $name
+            . '</div>';
         $ret .= $content;
         $ret .= '</div>';
 
@@ -3357,25 +3384,25 @@ class AdminCODwFeePlusController extends ModuleAdminController
     public function getContrastColor($hexColor)
     {
 
-//////////// hexColor RGB
+        //////////// hexColor RGB
         $R1 = hexdec(substr($hexColor, 1, 2));
         $G1 = hexdec(substr($hexColor, 3, 2));
         $B1 = hexdec(substr($hexColor, 5, 2));
 
-//////////// Black RGB
+        //////////// Black RGB
         $blackColor = "#000000";
         $R2BlackColor = hexdec(substr($blackColor, 1, 2));
         $G2BlackColor = hexdec(substr($blackColor, 3, 2));
         $B2BlackColor = hexdec(substr($blackColor, 5, 2));
 
-//////////// Calc contrast ratio
+        //////////// Calc contrast ratio
         $L1 = 0.2126 * pow($R1 / 255, 2.2) +
-                0.7152 * pow($G1 / 255, 2.2) +
-                0.0722 * pow($B1 / 255, 2.2);
+            0.7152 * pow($G1 / 255, 2.2) +
+            0.0722 * pow($B1 / 255, 2.2);
 
         $L2 = 0.2126 * pow($R2BlackColor / 255, 2.2) +
-                0.7152 * pow($G2BlackColor / 255, 2.2) +
-                0.0722 * pow($B2BlackColor / 255, 2.2);
+            0.7152 * pow($G2BlackColor / 255, 2.2) +
+            0.0722 * pow($B2BlackColor / 255, 2.2);
 
         $contrastRatio = 0;
         if ($L1 > $L2) {
@@ -3384,12 +3411,11 @@ class AdminCODwFeePlusController extends ModuleAdminController
             $contrastRatio = (int) (($L2 + 0.05) / ($L1 + 0.05));
         }
 
-//////////// If contrast is more than 5, return black color
+        //////////// If contrast is more than 5, return black color
         if ($contrastRatio > 5) {
             return '#000000';
         } else { //////////// if not, return white color.
             return '#FFFFFF';
         }
     }
-
 }
