@@ -64,7 +64,7 @@ class codwfeeplus extends PaymentModule
         }
         $this->name = 'codwfeeplus';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.9';
+        $this->version = '1.1.10';
         $this->author = 'Sakis Gkiokas';
         $this->need_instance = 1;
         if ($this->is17) {
