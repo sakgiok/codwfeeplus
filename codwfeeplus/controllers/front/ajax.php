@@ -38,6 +38,8 @@ class CODwFeePlusAjaxModuleFrontController extends ModuleFrontController
                 $cart = $this->cart_presenter->present(
                         $this->context->cart
                 );
+                $subtotals = $cart->getSubtotals();
+                $totals = $cart->getTotals();
 
                 if ($cod_active) {
                     $taxconfiguration = new TaxConfiguration();
@@ -64,29 +66,32 @@ class CODwFeePlusAjaxModuleFrontController extends ModuleFrontController
                         $CODFee_final = $CODfee_notax;
                     }
 
-                    if (isset($cart['subtotals']['tax'])) {
-                        $cart['subtotals']['tax']['amount'] += $CODfee_tax_amount;
-                        $cart['subtotals']['tax']['value'] = Tools::displayPrice($cart['subtotals']['tax']['amount']);
+                    if (isset($subtotals['tax'])) {
+                        $subtotals['tax']['amount'] += $CODfee_tax_amount;
+                        $subtotals['tax']['value'] = Tools::displayPrice($subtotals['tax']['amount']);
                     }
-                    $cart['subtotals']['cod'] = array(
+                    $subtotals['cod'] = array(
                         'amount' => $CODFee_final,
                         'label' => $this->module->l('Cash on delivery fee', 'ajax'),
                         'type' => 'cod_fee',
                         'value' => Tools::displayPrice($CODFee_final),
                     );
-                    if (isset($cart['totals']['total']['amount'])) {
-                        $cart['totals']['total']['amount'] += $CODFee_final;
-                        $cart['totals']['total']['value'] = Tools::displayPrice($cart['totals']['total']['amount']);
+
+                    if (isset($totals['total']['amount'])) {
+                        $totals['total']['amount'] += $CODFee_final;
+                        $totals['total']['value'] = Tools::displayPrice($totals['total']['amount']);
                     }
-                    if (isset($cart['totals']['total_excluding_tax']['amount'])) {
-                        $cart['totals']['total_excluding_tax']['amount'] += $CODfee_notax;
-                        $cart['totals']['total_excluding_tax']['value'] = Tools::displayPrice($cart['totals']['total_excluding_tax']['amount']);
+                    if (isset($totals['total_excluding_tax']['amount'])) {
+                        $totals['total_excluding_tax']['amount'] += $CODfee_notax;
+                        $totals['total_excluding_tax']['value'] = Tools::displayPrice($totals['total_excluding_tax']['amount']);
                     }
-                    if (isset($cart['totals']['total_including_tax']['amount'])) {
-                        $cart['totals']['total_including_tax']['amount'] += $CODfee;
-                        $cart['totals']['total_including_tax']['value'] = Tools::displayPrice($cart['totals']['total_including_tax']['amount']);
+                    if (isset($totals['total_including_tax']['amount'])) {
+                        $totals['total_including_tax']['amount'] += $CODfee;
+                        $totals['total_including_tax']['value'] = Tools::displayPrice($totals['total_including_tax']['amount']);
                     }
                 }
+                $cart['subtotals'] = $subtotals;
+                $cart['totals'] = $totals;
 
                 ob_end_clean();
                 header('Content-Type: application/json');
